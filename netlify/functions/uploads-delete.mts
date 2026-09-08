@@ -9,7 +9,7 @@ import { and, eq } from 'drizzle-orm'
 import { uploadedFiles } from '../../db/schema.ts'
 import { getDb } from '../lib/db.ts'
 import { HttpError, handle, noContent } from '../lib/http.ts'
-import { deleteBlobQuietly, filesStore } from '../lib/uploads.ts'
+import { deleteQuietly, filesStore } from '../lib/storage.ts'
 import { loadSubmissionByToken } from '../lib/tokens.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -45,7 +45,7 @@ export default handle(async (request: Request, context: Context) => {
 
   // The row is gone either way; an orphaned blob is tidied up rather than
   // being allowed to fail the customer's delete.
-  await deleteBlobQuietly(filesStore(), removed.blobKey)
+  await deleteQuietly(filesStore(), removed.blobKey)
 
   return noContent()
 })

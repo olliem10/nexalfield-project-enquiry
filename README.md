@@ -22,15 +22,21 @@ so hiding the UI is never the thing keeping data private.
 
 - **Vite 7 + React 19 + TypeScript**, `react-router-dom` 7. The dashboard is
   behind `React.lazy`, so admin code is never in the customer bundle.
-- **Netlify Functions** (v2, `.mts`) for the entire API.
+- **One API, two hosts.** The handlers are plain `Request` in, `Response` out.
+  Netlify serves them as v2 functions; Vercel serves them through
+  `api/[...path].ts`. `netlify/lib/router.ts` builds the routing table from each
+  function's own `config`, so neither host can drift from the other.
 - **Netlify Database** (Postgres) via **Drizzle ORM** (stable 0.45). Migrations
   in `netlify/database/migrations`, applied on deploy by Netlify's own database
   extension. Every migration must be safe to re-run — see below.
-- **Netlify Blobs** for uploaded files. The store is not web-addressable: the
-  only way to read a file is through a function that has already authorised the
-  caller.
-- **Netlify AI Gateway** (`claude-opus-5` by default, `AI_SUMMARY_MODEL` to
-  override) for project summaries.
+- **Uploaded files** go to Netlify Blobs on Netlify and to Postgres
+  (`blob_objects`) everywhere else — see `netlify/lib/storage.ts`. Neither is
+  web-addressable: the only way to read a file is through a function that has
+  already authorised the caller.
+- **Claude** (`claude-opus-5` by default, `AI_SUMMARY_MODEL` to override) for
+  project summaries — through Netlify's AI Gateway where it exists, otherwise a
+  plain `ANTHROPIC_API_KEY`. Without either, submission still succeeds and the
+  summary is marked pending.
 - **Resend or SMTP** for the confirmation email.
 
 ## Layout
@@ -47,7 +53,8 @@ netlify/lib/              Shared server code — http, auth, session, answers, u
                           email, ai, tasks.
 netlify/functions/        15 functions. Routes are declared in each file's
                           `export const config`.
-scripts/                  hash-password, migrate, and the three test harnesses.
+api/                      Vercel entry points: the catch-all, and the cron target.
+scripts/                  hash-password, migrate, and the test harnesses.
 src/questionnaire/        Customer wizard.
 src/dashboard/            Admin dashboard (lazy-loaded).
 src/components/           Reusable UI, including one control per question type.
@@ -158,6 +165,32 @@ variables. `test:browser` additionally needs `npm run start:local` running, and
 writes screenshots to `.screenshots/`.
 
 ## Deploying
+
+The same commit deploys to either host. Both build with `npm run build` and
+publish `dist/`.
+
+### Vercel
+
+`vercel.json` sets the build, the single-page-app rewrite, the security headers
+and the hourly cron. Provision a Postgres database (Neon's free tier is enough)
+and set:
+
+| Variable | Needed for |
+| --- | --- |
+| `DATABASE_URL` | everything |
+| `SESSION_SECRET` | the dashboard |
+| `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD_HASH` | the dashboard |
+| `RESEND_API_KEY` *or* the `SMTP_*` set | the confirmation email |
+| `ANTHROPIC_API_KEY` | the AI project summary |
+| `CRON_SECRET` | protecting `/api/cron/retry` |
+
+Only `DATABASE_URL` is required to fill in and submit the questionnaire; the
+rest degrade gracefully and are reported in the dashboard.
+
+Migrations are not run by the build. Apply them once with
+`DATABASE_URL=… npm run db:migrate`.
+
+### Netlify
 
 Connect the repository to Netlify and set the environment variables from
 `.env.example` under **Site configuration → Environment variables**. The

@@ -12,7 +12,8 @@ import { uploadSessions } from '../../db/schema.ts'
 import { MAX_UPLOAD_BYTES } from '../../shared/questionnaire.ts'
 import { getDb } from '../lib/db.ts'
 import { HttpError, handle, json } from '../lib/http.ts'
-import { chunkKey, chunksStore } from '../lib/uploads.ts'
+import { chunkKey } from '../lib/uploads.ts'
+import { chunksStore } from '../lib/storage.ts'
 import { loadSubmissionByToken } from '../lib/tokens.ts'
 
 export default handle(async (request: Request, _context: Context) => {
@@ -63,8 +64,7 @@ export default handle(async (request: Request, _context: Context) => {
     throw new HttpError(413, 'file_too_large', 'Files need to be 20MB or smaller.')
   }
 
-  // Blobs takes an ArrayBuffer or a Blob, never a typed-array view.
-  await chunksStore().set(chunkKey(uploadId, index), new Blob([bytes]))
+  await chunksStore().put(chunkKey(uploadId, index), bytes)
 
   await db
     .update(uploadSessions)

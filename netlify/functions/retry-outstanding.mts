@@ -12,7 +12,7 @@ import { submissions, uploadSessions } from '../../db/schema.ts'
 import { getDb } from '../lib/db.ts'
 import { pruneRateLimits } from '../lib/http.ts'
 import { findOutstanding, runEmailTask, runSummaryTask } from '../lib/tasks.ts'
-import { chunksStore, deleteBlobQuietly } from '../lib/uploads.ts'
+import { chunksStore, deleteQuietly, prunePostgresChunks } from '../lib/storage.ts'
 
 async function retryOutstanding(): Promise<number> {
   const pending = await findOutstanding(20)
@@ -47,9 +47,13 @@ async function pruneUploads(): Promise<number> {
   const chunks = chunksStore()
   for (const session of expired) {
     for (let index = 0; index < session.totalChunks; index += 1) {
-      await deleteBlobQuietly(chunks, `${session.id}/${String(index).padStart(5, '0')}`)
+      await deleteQuietly(chunks, `${session.id}/${String(index).padStart(5, '0')}`)
     }
   }
+
+  // Belt and braces for the Postgres backend: sweeps parts whose upload session
+  // row has already gone, which the loop above could never reach.
+  await prunePostgresChunks(24 * 60 * 60 * 1000)
 
   return expired.length
 }

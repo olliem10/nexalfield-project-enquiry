@@ -9,10 +9,12 @@
 import { relations, sql } from 'drizzle-orm'
 import {
   boolean,
+  customType,
   index,
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -211,6 +213,40 @@ export const checklistItems = pgTable(
  * Rate limiting
  * ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ *
+ * Stored objects
+ * ------------------------------------------------------------------ */
+
+/** Postgres has no first-class Drizzle type for raw bytes. */
+const bytea = customType<{ data: Buffer; driverData: Buffer; default: false }>({
+  dataType() {
+    return 'bytea'
+  },
+})
+
+/**
+ * Uploaded file contents, and the parts of an upload still in flight.
+ *
+ * Used wherever Netlify Blobs is not available — see netlify/lib/storage.ts.
+ * Keeping bytes here means a deployment needs one service rather than two, and
+ * the rows are no more reachable than the rest of the data: every read goes
+ * through a function that has already authorised the caller.
+ */
+export const blobObjects = pgTable(
+  'blob_objects',
+  {
+    bucket: text('bucket').notNull(),
+    key: text('key').notNull(),
+    bytes: bytea('bytes').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.bucket, table.key] }),
+    // Sweeping abandoned upload parts.
+    index('blob_objects_bucket_created_idx').on(table.bucket, table.createdAt),
+  ],
+)
+
 export const rateLimits = pgTable('rate_limits', {
   key: text('key').primaryKey(),
   count: integer('count').notNull().default(0),
@@ -253,3 +289,4 @@ export type UploadedFile = typeof uploadedFiles.$inferSelect
 export type UploadSession = typeof uploadSessions.$inferSelect
 export type InternalNote = typeof internalNotes.$inferSelect
 export type ChecklistItem = typeof checklistItems.$inferSelect
+export type BlobObject = typeof blobObjects.$inferSelect

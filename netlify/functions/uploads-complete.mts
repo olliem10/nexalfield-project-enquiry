@@ -12,14 +12,8 @@ import { MAX_UPLOAD_BYTES } from '../../shared/questionnaire.ts'
 import { assertUploadFieldAccepts } from '../lib/answers.ts'
 import { getDb } from '../lib/db.ts'
 import { HttpError, handle, json, readJson } from '../lib/http.ts'
-import {
-  blobKey,
-  chunkKey,
-  chunksStore,
-  deleteBlobQuietly,
-  filesStore,
-  verifyUpload,
-} from '../lib/uploads.ts'
+import { blobKey, chunkKey, verifyUpload } from '../lib/uploads.ts'
+import { chunksStore, deleteQuietly, filesStore } from '../lib/storage.ts'
 import { loadSubmissionByToken } from '../lib/tokens.ts'
 
 export default handle(async (request: Request, _context: Context) => {
@@ -61,7 +55,7 @@ export default handle(async (request: Request, _context: Context) => {
   )
 
   async function cleanUp(): Promise<void> {
-    await Promise.all(keys.map((key) => deleteBlobQuietly(chunks, key)))
+    await Promise.all(keys.map((key) => deleteQuietly(chunks, key)))
     await db.delete(uploadSessions).where(eq(uploadSessions.id, uploadId))
   }
 
@@ -69,7 +63,7 @@ export default handle(async (request: Request, _context: Context) => {
   let total = 0
 
   for (const key of keys) {
-    const part = await chunks.get(key, { type: 'arrayBuffer' })
+    const part = await chunks.get(key)
     if (!part) {
       await cleanUp()
       throw new HttpError(
@@ -78,7 +72,7 @@ export default handle(async (request: Request, _context: Context) => {
         'Part of that file did not arrive. Please upload it again.',
       )
     }
-    const bytes = new Uint8Array(part)
+    const bytes = part
     total += bytes.byteLength
     if (total > MAX_UPLOAD_BYTES) {
       await cleanUp()
@@ -139,14 +133,7 @@ export default handle(async (request: Request, _context: Context) => {
   const key = blobKey(submission.id, record.id)
 
   try {
-    await filesStore().set(key, new Blob([assembled]), {
-      metadata: {
-        submissionId: submission.id,
-        fieldId: session.fieldId,
-        fileName: session.fileName,
-        contentType: verified.contentType,
-      },
-    })
+    await filesStore().put(key, assembled)
   } catch (error) {
     // Do not leave a database row pointing at bytes that were never written.
     await db.delete(uploadedFiles).where(eq(uploadedFiles.id, record.id))

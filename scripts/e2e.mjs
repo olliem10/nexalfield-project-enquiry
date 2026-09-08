@@ -5,35 +5,17 @@
  *
  *   node --experimental-strip-types scripts/e2e.mjs
  */
-import { BlobsServer } from '@netlify/blobs/server'
-import { mkdtempSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+
 
 /* ---------------------------------------------------------------- *
  * Environment
  * ---------------------------------------------------------------- */
 
-const BLOB_DIR = mkdtempSync(join(tmpdir(), 'nf-blobs-'))
-const BLOB_TOKEN = 'local-blobs-token'
-
-const blobServer = new BlobsServer({
-  directory: BLOB_DIR,
-  token: BLOB_TOKEN,
-  port: 0,
-})
-const { port: blobPort } = await blobServer.start()
-
-process.env.NETLIFY_BLOBS_CONTEXT = Buffer.from(
-  JSON.stringify({
-    edgeURL: `http://127.0.0.1:${blobPort}`,
-    uncachedEdgeURL: `http://127.0.0.1:${blobPort}`,
-    token: BLOB_TOKEN,
-    siteID: 'nexalfield-test',
-    primaryRegion: 'us-east-1',
-  }),
-).toString('base64')
-
+/*
+ * No blob server: outside Netlify the object store is Postgres, which is
+ * exactly what Vercel will use, so uploads are exercised through the same
+ * backend the deployment uses.
+ */
 /* ---------------------------------------------------------------- *
  * Test plumbing
  * ---------------------------------------------------------------- */
@@ -817,7 +799,14 @@ check('the hourly job runs', housekeeping.status === 200)
 section('11. Persistence')
 
 const { Client } = await import('pg')
-const client = new Client({ connectionString: process.env.NETLIFY_DATABASE_URL })
+// Resolved the way the application resolves it, so the suite runs against
+// either a Netlify- or a Vercel-shaped environment.
+const client = new Client({
+  connectionString:
+    process.env.DATABASE_URL ||
+    process.env.NETLIFY_DATABASE_URL ||
+    process.env.NETLIFY_DB_URL,
+})
 await client.connect()
 const rows = await client.query(
   'select reference, status, business_name, email, submitted_at from submissions where reference = $1',
@@ -851,7 +840,6 @@ await client.end()
  * Result
  * ---------------------------------------------------------------- */
 
-await blobServer.stop()
 
 console.log(`\n[1m${passed} passed, ${failed} failed[0m`)
 if (failed > 0) {

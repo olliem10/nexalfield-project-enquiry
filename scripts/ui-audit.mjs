@@ -348,7 +348,11 @@ async function touchPass(width) {
  * behaviour. Clearing the counter between viewports keeps the audit moving
  * without weakening the limit itself.
  */
-const limiter = new pg.Pool({ connectionString: process.env.NETLIFY_DATABASE_URL, max: 1 })
+const limiter = new pg.Pool({
+  connectionString:
+    process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL || process.env.NETLIFY_DB_URL,
+  max: 1,
+})
 const clearRateLimits = () => limiter.query('delete from rate_limits')
 
 await clearRateLimits()
