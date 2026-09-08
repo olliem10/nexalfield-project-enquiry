@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+.vite
+
+# Netlify local state: embedded database, local blob store, function bundles,
+# downloaded assets. None of it belongs in source control.
+.netlify
+
+# Environment files — never commit real values. Use .env.example as the template.
+.env
+.env.local
+.env.*.local
+
+# Logs and editor cruft
+*.log
+.DS_Store
+Thumbs.db
