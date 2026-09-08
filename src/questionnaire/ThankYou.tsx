@@ -76,15 +76,15 @@ export function ThankYou({ reference, token, onStartAnother }: ThankYouProps) {
         <p className="eyebrow">Questionnaire received</p>
         <h1>Thank You</h1>
         <p className="lede">
-          We&rsquo;ve received your project questionnaire. We will review everything and contact you
-          if we need any additional information.
+          Your website project questionnaire has been received. We&rsquo;ll review your
+          requirements and contact you if we need any additional information.
         </p>
         <p className="lede">
-          Expected response time: <strong>1–2 business days.</strong>
+          Expected review time: <strong>1–2 business days.</strong>
         </p>
 
         {reference ? (
-          <div className="reference-plate">
+          <div className="reference-plate reference-plate-arrive">
             <span className="small muted">Your reference number</span>
             <strong className="mono">{reference}</strong>
             <span className="small muted">Quote this in any emails about your project</span>
@@ -132,7 +132,7 @@ export function ThankYou({ reference, token, onStartAnother }: ThankYouProps) {
         <a className="btn" href="https://www.nexalfield.com" rel="noreferrer">
           Back to nexalfield.com
         </a>
-        <button type="button" className="btn btn-ghost" onClick={onStartAnother}>
+        <button type="button" className="btn" onClick={onStartAnother}>
           Start another questionnaire
         </button>
       </div>

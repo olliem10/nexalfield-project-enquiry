@@ -21,6 +21,7 @@ export function QuestionnairePage() {
     step,
     section,
     percent,
+    sectionErrors,
     notice,
     startError,
     resumed,
@@ -45,6 +46,16 @@ export function QuestionnairePage() {
 
   const inWizard = phase === 'wizard' || phase === 'review'
 
+  /*
+   * The masthead, the page title and its lede together pushed the first
+   * question 635px down an 844px phone — three quarters of the opening screen
+   * spent on furniture the customer had already read, repeated on all seven
+   * steps. Once the wizard starts, the progress panel ("Step 3 of 7 ·
+   * Branding & Design") and the section card carry the context, so the title
+   * stays only for screen readers.
+   */
+  const showTitleBlock = phase === 'loading' || phase === 'intro'
+
   return (
     <>
       <a className="skip-link" href="#questionnaire">
@@ -59,7 +70,7 @@ export function QuestionnairePage() {
       </Masthead>
 
       <main className="shell" id="questionnaire">
-        {phase !== 'done' ? (
+        {showTitleBlock ? (
           <div className="page-intro stack-sm">
             <p className="eyebrow">NexalField</p>
             <h1>Website Project Questionnaire</h1>
@@ -68,6 +79,8 @@ export function QuestionnairePage() {
               represents your business and goals.
             </p>
           </div>
+        ) : inWizard ? (
+          <h1 className="visually-hidden">Website Project Questionnaire</h1>
         ) : null}
 
         {phase === 'loading' ? (
@@ -90,7 +103,14 @@ export function QuestionnairePage() {
             <div className="wizard-main">
               <WizardProgress
                 step={step}
-                percent={percent}
+                /*
+                 * Optional questions a customer chose to skip should not leave
+                 * them staring at "73% complete" on the screen where they
+                 * submit. At review with nothing outstanding they are done, so
+                 * the bar says so; if a required answer is missing the real
+                 * figure is shown, which is exactly when it is informative.
+                 */
+                percent={phase === 'review' && sectionErrors.size === 0 ? 100 : percent}
                 section={section}
                 reviewing={phase === 'review'}
               />
@@ -156,7 +176,7 @@ export function QuestionnairePage() {
             <aside className="wizard-aside">
               <WhatHappensNext />
               {token && phase === 'wizard' ? (
-                <div className="card-quiet stack-sm">
+                <div className="card-quiet stack-sm save-panel">
                   <h3 style={{ fontSize: '1rem' }}>Need to stop?</h3>
                   <p className="small muted">
                     Your progress is saved on our server as you type. Save a continuation link if

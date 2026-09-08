@@ -22,7 +22,17 @@
 
   --ink: #1d201e;
   --ink-soft: #3c423f;
-  --ink-muted: #6b716d;
+  /*
+   * Secondary text. Dark enough to clear WCAG AA (4.5:1) on all three
+   * surfaces, including the sunken one — at the previous #6b716d it measured
+   * 4.47:1 on --paper-sunken, so help text inside quiet cards, repeater rows
+   * and the dropzone was failing.
+   */
+  --ink-muted: #5f6562;
+  /*
+   * Decorative only — placeholder chrome, hairline hovers, disabled marks.
+   * Never put text a customer needs to read in this: it is 2.2:1.
+   */
   --ink-faint: #a7aca8;
 
   --line: #e6e1d8;
@@ -48,6 +58,11 @@
   --radius: 10px;
   --radius-sm: 7px;
   --tap: 46px;
+  /*
+   * Height of the sticky progress panel, so scrolling to a field never parks
+   * it underneath. Zero once the panel stops being sticky at 1000px.
+   */
+  --sticky-top: 84px;
 
   /* Depth ------------------------------------------------------------ */
   --shadow-sm: 0 1px 2px rgba(29, 32, 30, 0.05);
@@ -63,6 +78,12 @@
 @media (min-width: 720px) {
   :root {
     --gutter: 32px;
+  }
+}
+
+@media (min-width: 1000px) {
+  :root {
+    --sticky-top: 0px;
   }
 }
 

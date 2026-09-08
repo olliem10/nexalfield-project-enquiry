@@ -110,9 +110,19 @@
 }
 
 .btn-sm {
-  min-height: 38px;
+  min-height: 40px;
   padding: 7px 14px;
   font-size: 0.86rem;
+}
+
+/*
+ * On a touch device every button clears 44px. Kept off pointer:fine so the
+ * dashboard's dense controls stay compact for a mouse.
+ */
+@media (pointer: coarse) {
+  .btn-sm {
+    min-height: 44px;
+  }
 }
 
 .btn-block {

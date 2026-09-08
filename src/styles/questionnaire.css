@@ -161,7 +161,8 @@
 
 .question-optional {
   font-size: 0.78rem;
-  color: var(--ink-faint);
+  /* Readable: this tells the customer they may skip the question. */
+  color: var(--ink-muted);
   font-weight: 400;
 }
 
@@ -303,9 +304,14 @@
   padding: 26px 20px;
   text-align: center;
   background: var(--paper-sunken);
-  border: 1px dashed var(--line-strong);
+  /* 2px reads as a drop target; 1px read as a plain filled panel. */
+  border: 2px dashed var(--line-strong);
   border-radius: var(--radius);
   transition: border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+}
+
+.dropzone:hover {
+  border-color: var(--ink-faint);
 }
 
 .dropzone-active {
@@ -361,6 +367,16 @@
 .file-row-error {
   border-color: var(--danger);
   background: var(--danger-soft);
+}
+
+/*
+ * Removing a file you just attached is an ordinary correction, not a
+ * destructive act — a red button beside every upload made a completed step
+ * look like an error state. The red is kept for the hover.
+ */
+.file-row .btn-danger:not(:hover),
+.repeater-row .btn-danger:not(:hover) {
+  color: var(--ink-soft);
 }
 
 .upload-bar {
@@ -454,6 +470,15 @@
   }
 }
 
+/*
+ * Save & continue later lives in one place at a time.
+ *
+ * Below 640px only the side panel has it (the bottom bar needs its width for
+ * Back and Continue). From 640px the bottom bar carries it, because the panel
+ * has been pushed below the questions. From 1000px the panel becomes a sticky
+ * sidebar that is always in view, so the bar gives it up again — otherwise
+ * both were on screen at once, which measurement confirmed at 1440px.
+ */
 .nav-save {
   display: none;
 }
@@ -461,6 +486,23 @@
 @media (min-width: 640px) {
   .nav-save {
     display: inline-flex;
+  }
+}
+
+@media (min-width: 1000px) {
+  .nav-save {
+    display: none;
+  }
+}
+
+/*
+ * The other half of that rule. Between 640px and 999px the bottom bar carries
+ * Save & continue later, so the side panel's copy of it stands down —
+ * otherwise both are on screen together once the page is scrolled to the end.
+ */
+@media (min-width: 640px) and (max-width: 999px) {
+  .save-panel {
+    display: none;
   }
 }
 
@@ -618,13 +660,43 @@
 }
 
 .answer-empty {
-  color: var(--ink-faint);
+  /*
+   * This is what a customer scans the review page for. At --ink-faint it was
+   * 2.3:1 and effectively invisible against the card.
+   */
+  color: var(--ink-muted);
   font-style: italic;
 }
 
 /* ------------------------------------------------------------------ *
  * Save-for-later + thank you
  * ------------------------------------------------------------------ */
+
+/*
+ * Completion. One restrained arrival on the reference number — the single
+ * thing the customer came away for — rather than a flourish on the whole page.
+ * Removed entirely under prefers-reduced-motion by the rule in tokens.css.
+ */
+@keyframes reference-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reference-plate-arrive {
+  animation: reference-arrive var(--speed-slow) var(--ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-plate-arrive {
+    animation: none;
+  }
+}
 .resume-box {
   display: grid;
   gap: 10px;

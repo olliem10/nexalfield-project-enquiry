@@ -81,9 +81,16 @@ export function SummaryPanel({ project, onUpdated }: SummaryPanelProps) {
 
       {project.summaryStatus === 'failed' ? (
         <Notice tone="warning" title="Summary could not be generated">
-          {project.summaryError ?? 'The model did not return a usable summary.'}{' '}
-          {project.summaryAttempts > 0 ? `Attempts: ${project.summaryAttempts}.` : ''} The
-          questionnaire answers below are complete and unaffected.
+          {/* Each part ends in a full stop so the reason, the attempt count and
+              the reassurance do not run together into one sentence. */}
+          <span>
+            {(project.summaryError ?? 'The model did not return a usable summary.').replace(
+              /\.?$/,
+              '.',
+            )}{' '}
+            {project.summaryAttempts > 0 ? `Attempts: ${project.summaryAttempts}. ` : ''}
+            The questionnaire answers below are complete and unaffected.
+          </span>
         </Notice>
       ) : null}
     </section>

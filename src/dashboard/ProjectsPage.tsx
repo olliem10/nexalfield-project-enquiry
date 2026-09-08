@@ -126,7 +126,10 @@ export function ProjectsPage() {
                 className="input"
                 type="search"
                 value={search}
-                placeholder="Business, contact, email or NEX reference"
+                /* Short enough to display in full on a 360px phone; the
+                    reference format is a more useful hint than the word
+                    "reference" was. */
+                placeholder="Name, email or NEX-0000"
                 onChange={(event) => setSearch(event.target.value)}
               />
               <button type="submit" className="btn">
