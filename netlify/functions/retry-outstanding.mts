@@ -7,12 +7,12 @@
  * notice and fix by hand.
  */
 import type { Config } from '@netlify/functions'
-import { and, eq, isNull, lt, sql } from 'drizzle-orm'
-import { submissions, uploadSessions } from '../../db/schema.ts'
+import { and, eq, inArray, isNull, lt, sql } from 'drizzle-orm'
+import { submissions, uploadSessions, uploadedFiles } from '../../db/schema.ts'
 import { getDb } from '../lib/db.ts'
 import { pruneRateLimits } from '../lib/http.ts'
 import { findOutstanding, runEmailTask, runSummaryTask } from '../lib/tasks.ts'
-import { chunksStore, deleteBlobQuietly } from '../lib/uploads.ts'
+import { chunksStore, deleteQuietly, filesStore, prunePostgresChunks } from '../lib/storage.ts'
 
 async function retryOutstanding(): Promise<number> {
   const pending = await findOutstanding(20)
@@ -47,9 +47,13 @@ async function pruneUploads(): Promise<number> {
   const chunks = chunksStore()
   for (const session of expired) {
     for (let index = 0; index < session.totalChunks; index += 1) {
-      await deleteBlobQuietly(chunks, `${session.id}/${String(index).padStart(5, '0')}`)
+      await deleteQuietly(chunks, `${session.id}/${String(index).padStart(5, '0')}`)
     }
   }
+
+  // Belt and braces for the Postgres backend: sweeps parts whose upload session
+  // row has already gone, which the loop above could never reach.
+  await prunePostgresChunks(24 * 60 * 60 * 1000)
 
   return expired.length
 }
@@ -57,22 +61,62 @@ async function pruneUploads(): Promise<number> {
 /**
  * Deletes drafts nobody came back to. A submitted record has its `expiresAt`
  * cleared at submission, so this can never reach a real customer record.
+ *
+ * A draft's uploaded files cascade away with it at the database level, but
+ * cascading only ever touched the `uploaded_files` rows — nothing told the
+ * object store (Netlify Blobs, or the `blob_objects` table on the Postgres
+ * backend) that those bytes were now unreachable, so every logo and photo on
+ * a pruned draft was leaked forever. This locks the expiring rows first, reads
+ * the file keys they still own, deletes the submissions, and only once that
+ * has actually committed does it remove the bytes.
+ *
+ * The row lock (`for('update')`) is what keeps this safe against a customer
+ * resuming mid-prune: a concurrent autosave on one of these exact rows blocks
+ * behind the lock rather than racing it, so a draft is either genuinely still
+ * expired when we act on it, or the autosave lands first and the row no
+ * longer matches — never both.
  */
 async function pruneDrafts(): Promise<number> {
   const db = getDb()
-  const removed = await db
-    .delete(submissions)
-    .where(
-      and(
-        isNull(submissions.submittedAt),
-        eq(submissions.status, 'draft'),
-        lt(submissions.expiresAt, new Date()),
-        sql`${submissions.expiresAt} is not null`,
-      ),
-    )
-    .returning({ id: submissions.id })
+  const expiredCondition = and(
+    isNull(submissions.submittedAt),
+    eq(submissions.status, 'draft'),
+    lt(submissions.expiresAt, new Date()),
+    sql`${submissions.expiresAt} is not null`,
+  )
 
-  return removed.length
+  const { removedIds, blobKeys } = await db.transaction(async (tx) => {
+    const candidates = await tx
+      .select({ id: submissions.id })
+      .from(submissions)
+      .where(expiredCondition)
+      .for('update')
+
+    if (candidates.length === 0) return { removedIds: [] as string[], blobKeys: [] as string[] }
+
+    const ids = candidates.map((row) => row.id)
+
+    const files = await tx
+      .select({ blobKey: uploadedFiles.blobKey })
+      .from(uploadedFiles)
+      .where(inArray(uploadedFiles.submissionId, ids))
+
+    const removed = await tx
+      .delete(submissions)
+      .where(inArray(submissions.id, ids))
+      .returning({ id: submissions.id })
+
+    return { removedIds: removed.map((row) => row.id), blobKeys: files.map((row) => row.blobKey) }
+  })
+
+  // Only after the transaction has committed: a rolled-back prune must never
+  // have already deleted bytes the database still thinks exist.
+  const store = filesStore()
+  for (const key of blobKeys) {
+    await deleteQuietly(store, key)
+  }
+
+  return removedIds.length
 }
 
 export default async () => {

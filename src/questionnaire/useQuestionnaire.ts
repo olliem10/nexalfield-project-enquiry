@@ -126,8 +126,8 @@ export function useQuestionnaire() {
           clearStoredToken()
           setNotice(
             error.status === 410
-              ? 'Your saved questionnaire has expired. You can start a new one below — it only takes 10–15 minutes.'
-              : 'We could not find that saved questionnaire. You can start a new one below.',
+              ? 'Your saved enquiry has expired. You can start a new one below — it only takes 10–15 minutes.'
+              : 'We could not find that saved enquiry. You can start a new one below.',
           )
           setPhase('intro')
           return
@@ -135,7 +135,7 @@ export function useQuestionnaire() {
         setStartError(
           error instanceof ApiError
             ? error.message
-            : 'We could not load your questionnaire. Please refresh and try again.',
+            : 'We could not load your enquiry. Please refresh and try again.',
         )
         setPhase('intro')
       }
@@ -170,7 +170,7 @@ export function useQuestionnaire() {
       setStartError(
         error instanceof ApiError
           ? error.message
-          : 'We could not start the questionnaire. Please try again.',
+          : 'We could not start the enquiry. Please try again.',
       )
     }
   }, [applySession])
@@ -348,7 +348,7 @@ export function useQuestionnaire() {
         setSubmitError(
           error instanceof ApiError
             ? error.message
-            : 'We could not send your questionnaire. Please try again.',
+            : 'We could not send your enquiry. Please try again.',
         )
       }
     } finally {

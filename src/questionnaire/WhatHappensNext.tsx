@@ -2,7 +2,7 @@ import { CollapsiblePanel } from '../components/CollapsiblePanel'
 
 const STEPS = [
   {
-    title: 'We review your questionnaire',
+    title: 'We review your enquiry',
     body: 'Ollie reads through everything you have sent, usually within 1–2 business days.',
   },
   {

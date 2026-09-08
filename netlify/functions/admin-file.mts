@@ -11,7 +11,8 @@ import { uploadedFiles } from '../../db/schema.ts'
 import { requireAdmin } from '../lib/auth.ts'
 import { getDb } from '../lib/db.ts'
 import { HttpError, handle } from '../lib/http.ts'
-import { contentDispositionHeader, dispositionFor, filesStore } from '../lib/uploads.ts'
+import { contentDispositionHeader, dispositionFor } from '../lib/uploads.ts'
+import { filesStore } from '../lib/storage.ts'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -35,8 +36,8 @@ export default handle(async (request: Request, context: Context) => {
 
   if (!file) throw new HttpError(404, 'not_found', 'We could not find that file.')
 
-  const blob = await filesStore().get(file.blobKey, { type: 'stream' })
-  if (!blob) {
+  const stream = await filesStore().getStream(file.blobKey)
+  if (!stream) {
     throw new HttpError(
       404,
       'file_missing',
@@ -47,7 +48,7 @@ export default handle(async (request: Request, context: Context) => {
   const wantsInline = new URL(request.url).searchParams.get('disposition') === 'inline'
   const disposition = dispositionFor(file.contentType, wantsInline)
 
-  return new Response(blob, {
+  return new Response(stream, {
     headers: {
       'content-type': file.contentType,
       'content-length': String(file.sizeBytes),

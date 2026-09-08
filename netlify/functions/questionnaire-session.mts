@@ -86,7 +86,7 @@ async function autosave(request: Request, context: Context): Promise<Response> {
     throw new HttpError(
       409,
       'already_submitted',
-      'This questionnaire has already been sent to us, so it can no longer be changed.',
+      'This enquiry has already been sent to us, so it can no longer be changed.',
     )
   }
 

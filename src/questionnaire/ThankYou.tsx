@@ -73,10 +73,10 @@ export function ThankYou({ reference, token, onStartAnother }: ThankYouProps) {
   return (
     <div className="stack-lg" style={{ paddingBottom: 48 }}>
       <div className="card stack">
-        <p className="eyebrow">Questionnaire received</p>
+        <p className="eyebrow">Project Enquiry received</p>
         <h1>Thank You</h1>
         <p className="lede">
-          Your website project questionnaire has been received. We&rsquo;ll review your
+          Your website project enquiry has been received. We&rsquo;ll review your
           requirements and contact you if we need any additional information.
         </p>
         <p className="lede">
@@ -121,7 +121,7 @@ export function ThankYou({ reference, token, onStartAnother }: ThankYouProps) {
         {(failed || state?.status === 'failed' || (generating && polls.current >= MAX_POLLS)) &&
         state?.status !== 'ready' ? (
           <Notice tone="info" title="Summary still being prepared">
-            Your questionnaire has been received in full — this summary is just a convenience and is
+            Your enquiry has been received in full — this summary is just a convenience and is
             still being generated. Ollie will see the complete version, so there is nothing more for
             you to do.
           </Notice>
@@ -133,7 +133,7 @@ export function ThankYou({ reference, token, onStartAnother }: ThankYouProps) {
           Back to nexalfield.com
         </a>
         <button type="button" className="btn" onClick={onStartAnother}>
-          Start another questionnaire
+          Start another enquiry
         </button>
       </div>
     </div>

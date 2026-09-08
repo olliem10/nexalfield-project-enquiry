@@ -146,7 +146,7 @@ export function ProjectPage({ onSignedOut }: ProjectPageProps) {
           <section className="stack">
             <div>
               <p className="eyebrow">As the customer answered it</p>
-              <h2>Questionnaire</h2>
+              <h2>Project Enquiry</h2>
             </div>
             <AnswersView answers={project.answers} files={files} />
           </section>

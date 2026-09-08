@@ -213,7 +213,7 @@ export function ProjectsPage() {
           >
             {query || status !== 'all'
               ? 'Try a different search term or status.'
-              : 'Completed customer questionnaires will appear here as soon as they are submitted.'}
+              : 'Completed customer enquiries will appear here as soon as they are submitted.'}
           </EmptyState>
         </div>
       ) : null}

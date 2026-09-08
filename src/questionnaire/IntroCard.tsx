@@ -17,7 +17,7 @@ export function IntroCard({ notice, error, onStart }: IntroCardProps) {
         </Notice>
       ) : null}
       {error ? (
-        <Notice tone="error" title="We could not start the questionnaire">
+        <Notice tone="error" title="We could not start the enquiry">
           {error}
         </Notice>
       ) : null}
@@ -52,7 +52,7 @@ export function IntroCard({ notice, error, onStart }: IntroCardProps) {
 
         <div className="row" style={{ marginTop: 4 }}>
           <button type="button" className="btn btn-primary" onClick={onStart}>
-            Start Questionnaire
+            Start Project Enquiry
           </button>
           <span className="small muted">No account needed</span>
         </div>

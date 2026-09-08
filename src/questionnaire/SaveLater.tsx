@@ -49,7 +49,7 @@ export function SaveLater({ token, onSave }: SaveLaterProps) {
         <div className="resume-box">
           <p className="small">
             <strong>Saved.</strong> Keep this link to continue on another device. It is the only way
-            back into your questionnaire, so treat it like a password.
+            back into your enquiry, so treat it like a password.
           </p>
           <div className="resume-link">
             <input
@@ -62,7 +62,7 @@ export function SaveLater({ token, onSave }: SaveLaterProps) {
             <CopyButton value={link} label="Copy link" />
           </div>
           <p className="small muted">
-            On this device you can simply return to the questionnaire — we will remember where you
+            On this device you can simply return to the enquiry — we will remember where you
             were.
           </p>
         </div>

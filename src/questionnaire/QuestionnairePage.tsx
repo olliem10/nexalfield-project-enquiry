@@ -40,8 +40,8 @@ export function QuestionnairePage() {
   useEffect(() => {
     document.title =
       phase === 'done'
-        ? 'Questionnaire received — NexalField'
-        : 'Website Project Questionnaire — NexalField'
+        ? 'Project Enquiry received — NexalField'
+        : 'Website Project Enquiry — NexalField'
   }, [phase])
 
   const inWizard = phase === 'wizard' || phase === 'review'
@@ -59,7 +59,7 @@ export function QuestionnairePage() {
   return (
     <>
       <a className="skip-link" href="#questionnaire">
-        Skip to the questionnaire
+        Skip to the enquiry
       </a>
       <Masthead>
         {inWizard && token ? (
@@ -73,20 +73,20 @@ export function QuestionnairePage() {
         {showTitleBlock ? (
           <div className="page-intro stack-sm">
             <p className="eyebrow">NexalField</p>
-            <h1>Website Project Questionnaire</h1>
+            <h1>Website Project Enquiry</h1>
             <p className="lede">
               Provide as much detail as possible so we can create a website that accurately
               represents your business and goals.
             </p>
           </div>
         ) : inWizard ? (
-          <h1 className="visually-hidden">Website Project Questionnaire</h1>
+          <h1 className="visually-hidden">Website Project Enquiry</h1>
         ) : null}
 
         {phase === 'loading' ? (
           <div className="stack-lg" style={{ paddingTop: 24 }}>
             <span className="visually-hidden" role="status">
-              Loading your questionnaire
+              Loading your enquiry
             </span>
             <SkeletonCard rows={3} />
           </div>
@@ -145,7 +145,7 @@ export function QuestionnairePage() {
               ) : null}
 
               {phase === 'wizard' ? (
-                <nav className="wizard-nav" aria-label="Questionnaire navigation">
+                <nav className="wizard-nav" aria-label="Project Enquiry navigation">
                   <div className="wizard-nav-inner">
                     <button
                       type="button"

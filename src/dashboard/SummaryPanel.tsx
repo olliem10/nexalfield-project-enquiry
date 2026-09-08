@@ -73,7 +73,7 @@ export function SummaryPanel({ project, onUpdated }: SummaryPanelProps) {
 
       {busy ? (
         <div className="stack-sm" aria-live="polite">
-          <p className="help">Generating the brief from the questionnaire…</p>
+          <p className="help">Generating the brief from the enquiry…</p>
           <Skeleton width="88%" />
           <Skeleton width="64%" />
         </div>
@@ -89,7 +89,7 @@ export function SummaryPanel({ project, onUpdated }: SummaryPanelProps) {
               '.',
             )}{' '}
             {project.summaryAttempts > 0 ? `Attempts: ${project.summaryAttempts}. ` : ''}
-            The questionnaire answers below are complete and unaffected.
+            The enquiry answers below are complete and unaffected.
           </span>
         </Notice>
       ) : null}

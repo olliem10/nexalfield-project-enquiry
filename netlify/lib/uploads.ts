@@ -1,32 +1,18 @@
 /**
- * File uploads.
+ * File uploads — naming, sniffing and verification.
  *
- * Files go into a Netlify Blobs store that has no public URL of any kind. The
- * only way to read one back is through `admin-file.mts`, which authenticates
- * the caller first — so an upload is private by construction rather than by
- * an unguessable address.
+ * Where the bytes actually live is `storage.ts`'s business. Whichever backend
+ * it picks has no public URL of any kind: the only way to read a file back is
+ * through `admin-file.mts`, which authenticates the caller first, so an upload
+ * is private by construction rather than by an unguessable address.
  *
  * A function request body is capped at 6MB, so each file is sliced into 4MB
  * parts by the browser, buffered here, then assembled and verified. The 20MB
  * limit is enforced four times over: in the browser, when the upload is opened,
  * on each part as it arrives, and finally on the assembled bytes.
  */
-import { getStore, type Store } from '@netlify/blobs'
 import { MAX_UPLOAD_BYTES, resolveUploadType, type UploadType } from '../../shared/questionnaire.ts'
 import { HttpError } from './http.ts'
-
-const FILES_STORE = 'nexalfield-uploads'
-const CHUNKS_STORE = 'nexalfield-upload-chunks'
-
-export function filesStore(): Store {
-  // Strong consistency: a file must be readable the instant it is written, or
-  // the dashboard would 404 on a record the customer has just submitted.
-  return getStore({ name: FILES_STORE, consistency: 'strong' })
-}
-
-export function chunksStore(): Store {
-  return getStore({ name: CHUNKS_STORE, consistency: 'strong' })
-}
 
 export function blobKey(submissionId: string, fileId: string): string {
   return `${submissionId}/${fileId}`
@@ -147,13 +133,4 @@ export function contentDispositionHeader(
   const ascii = fileName.replace(/[^\x20-\x7E]/g, '_').replace(/["\\]/g, '_')
   const encoded = encodeURIComponent(fileName)
   return `${disposition}; filename="${ascii}"; filename*=UTF-8''${encoded}`
-}
-
-/** Removes a file's bytes. A failure here must never block the database write. */
-export async function deleteBlobQuietly(store: Store, key: string): Promise<void> {
-  try {
-    await store.delete(key)
-  } catch (error) {
-    console.error('Could not delete blob', key, error)
-  }
 }

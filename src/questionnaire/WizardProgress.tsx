@@ -19,7 +19,7 @@ export function WizardProgress({ step, percent, section, reviewing }: WizardProg
         </span>
         <span className="progress-percent">{percent}% complete</span>
       </div>
-      <ProgressBar percent={percent} label={`Questionnaire progress: ${percent}% complete`} />
+      <ProgressBar percent={percent} label={`Project Enquiry progress: ${percent}% complete`} />
       <ol className="step-dots" aria-hidden="true">
         {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
           <li

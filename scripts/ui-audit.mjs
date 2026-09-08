@@ -322,7 +322,7 @@ async function touchPass(width) {
 
   await page.goto(`${BASE}/questionnaire`, { waitUntil: 'networkidle' })
   await scan('intro')
-  await page.getByRole('button', { name: 'Start Questionnaire' }).click()
+  await page.getByRole('button', { name: 'Start Project Enquiry' }).click()
   await page.waitForSelector('.progress-panel')
   await scan('wizard')
 
@@ -348,7 +348,11 @@ async function touchPass(width) {
  * behaviour. Clearing the counter between viewports keeps the audit moving
  * without weakening the limit itself.
  */
-const limiter = new pg.Pool({ connectionString: process.env.NETLIFY_DATABASE_URL, max: 1 })
+const limiter = new pg.Pool({
+  connectionString:
+    process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL || process.env.NETLIFY_DB_URL,
+  max: 1,
+})
 const clearRateLimits = () => limiter.query('delete from rate_limits')
 
 await clearRateLimits()
@@ -369,7 +373,7 @@ for (const viewport of VIEWPORTS) {
   await capture(page, viewport, '01-intro')
 
   /* Step 1, empty */
-  await tap(page, page.getByRole('button', { name: 'Start Questionnaire' }))
+  await tap(page, page.getByRole('button', { name: 'Start Project Enquiry' }))
   await page.waitForSelector('.progress-panel')
   await capture(page, viewport, '02-step1-empty')
 
@@ -460,7 +464,7 @@ for (const viewport of VIEWPORTS) {
   await capture(page, viewport, '11-review')
 
   /* Thank you */
-  await tap(page, page.getByRole('button', { name: 'Submit Questionnaire' }))
+  await tap(page, page.getByRole('button', { name: 'Submit Project Enquiry' }))
   await page.waitForSelector('.reference-plate', { timeout: 25000 })
   await page.waitForTimeout(2500)
   await capture(page, viewport, '12-thankyou')
