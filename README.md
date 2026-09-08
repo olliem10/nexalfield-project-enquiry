@@ -24,8 +24,8 @@ so hiding the UI is never the thing keeping data private.
   behind `React.lazy`, so admin code is never in the customer bundle.
 - **Netlify Functions** (v2, `.mts`) for the entire API.
 - **Netlify Database** (Postgres) via **Drizzle ORM** (stable 0.45). Migrations
-  in `netlify/database/migrations`, applied automatically at build time by
-  `npm run db:migrate`.
+  in `netlify/database/migrations`, applied on deploy by Netlify's own database
+  extension. Every migration must be safe to re-run — see below.
 - **Netlify Blobs** for uploaded files. The store is not web-addressable: the
   only way to read a file is through a function that has already authorised the
   caller.
@@ -139,7 +139,7 @@ needed in production.
 ```bash
 npm run typecheck    # tsc across the app and the server
 npm run db:generate  # new migration after editing db/schema.ts
-npm run db:migrate   # apply migrations (also runs as part of `npm run build`)
+npm run db:migrate   # apply migrations by hand (Netlify does this itself on deploy)
 ```
 
 ## Tests
@@ -165,10 +165,27 @@ database, blob store and AI gateway are provisioned by the platform;
 `NETLIFY_DATABASE_URL` and `ANTHROPIC_API_KEY` are injected automatically and
 should not be set by hand.
 
-Migrations run themselves: `npm run build` calls `npm run db:migrate` first, so
-a deploy cannot ship code that expects a column the database has not got. If no
-database is configured yet the step logs that and exits cleanly rather than
-failing the build.
+### Migrations must be idempotent
+
+Netlify's database extension runs the files in `netlify/database/migrations`
+itself, after the build. Its migration tracker is separate from Drizzle's, so a
+migration Drizzle has already applied can still be presented to Netlify as
+pending.
+
+That is not hypothetical: the build command used to run `npm run db:migrate`
+too, so 0000 ran twice, the second run hit
+`relation "checklist_items" already exists`, and the deploy failed even though
+the build had succeeded.
+
+So: **Netlify owns migrations on deploy, and every migration is written to be
+safe to re-run.** After `npm run db:generate`, edit the generated SQL to add the
+guards — `CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, and a
+`DO $$ ... EXCEPTION WHEN duplicate_object THEN null; END $$;` block around each
+`ADD CONSTRAINT`, since Postgres has no `IF NOT EXISTS` for those.
+`0000_initial_schema.sql` is the worked example.
+
+`npm run db:migrate` remains for applying migrations by hand — locally, or
+against production from a machine that can reach it.
 
 ### One thing to replace
 

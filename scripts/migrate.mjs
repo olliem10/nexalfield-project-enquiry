@@ -2,12 +2,17 @@
 /**
  * Applies any unapplied migrations from netlify/database/migrations.
  *
- * Run as part of the Netlify build, so a deploy can never reach production with
- * code that expects a column the database has not got. Drizzle records what it
- * has already run, so this is safe to run on every build.
+ * NOT part of the Netlify build. Netlify's own database extension runs the
+ * files in that directory after the build, using its own migration tracker —
+ * so having this run during the build meant two runners with two trackers, and
+ * the second one re-ran 0000 and failed the deploy on `relation
+ * "checklist_items" already exists`.
  *
- * With no database configured it says so and exits cleanly — a first build
- * before the database is provisioned should not fail the deploy.
+ * Netlify owns migrations on deploy. This script is for running them by hand:
+ * against a local `netlify dev` database, or against production from a machine
+ * that can reach it.
+ *
+ * With no database configured it says so and exits cleanly.
  */
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
