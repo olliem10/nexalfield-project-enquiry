@@ -1,0 +1,94 @@
+/* ------------------------------------------------------------------ *
+ * NexalField design tokens
+ *
+ * The palette is taken from the nexalfield.com identity: a deep forest green
+ * on warm off-white paper, with a serif for headings and a neutral grotesque
+ * for everything else. Restrained on purpose — the questionnaire should feel
+ * like correspondence from a studio, not a product dashboard.
+ * ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  /* Brand ------------------------------------------------------------ */
+  --accent: #245945;
+  --accent-hover: #1b4636;
+  --accent-soft: #eef3f0;
+  --accent-line: #cbdcd4;
+
+  /* Paper and ink ---------------------------------------------------- */
+  --paper: #fbfaf8;
+  --paper-raised: #ffffff;
+  --paper-sunken: #f5f2ec;
+
+  --ink: #1d201e;
+  --ink-soft: #3c423f;
+  --ink-muted: #6b716d;
+  --ink-faint: #a7aca8;
+
+  --line: #e6e1d8;
+  --line-strong: #d4cec2;
+
+  /* Feedback --------------------------------------------------------- */
+  --danger: #9a2f26;
+  --danger-soft: #fbf0ee;
+  --warning: #8a6206;
+  --warning-soft: #fdf6e6;
+
+  /* Type ------------------------------------------------------------- */
+  --serif: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman',
+    serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* Metrics ---------------------------------------------------------- */
+  --shell: 1120px;
+  --measure: 68ch;
+  --gutter: 20px;
+  --radius: 10px;
+  --radius-sm: 7px;
+  --tap: 46px;
+
+  /* Depth ------------------------------------------------------------ */
+  --shadow-sm: 0 1px 2px rgba(29, 32, 30, 0.05);
+  --shadow-card: 0 1px 2px rgba(29, 32, 30, 0.04), 0 10px 28px -20px rgba(29, 32, 30, 0.3);
+  --shadow-focus: 0 0 0 3px rgba(36, 89, 69, 0.16);
+
+  /* Motion — subtle by design, and switched off entirely below. ------- */
+  --speed: 180ms;
+  --speed-slow: 320ms;
+  --ease: cubic-bezier(0.32, 0.72, 0.35, 1);
+}
+
+@media (min-width: 720px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+@media (min-width: 1180px) {
+  :root {
+    --gutter: 40px;
+  }
+}
+
+/*
+ * Everything animated in this application is decorative: transitions, the
+ * shimmer on loading placeholders, the completion flourish. None of it carries
+ * meaning on its own, so it is all removed rather than merely shortened.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --speed: 0ms;
+    --speed-slow: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
