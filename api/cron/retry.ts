@@ -1,14 +1,12 @@
 /**
- * The hourly housekeeping job, as a Vercel Cron target.
+ * The housekeeping job, as a Vercel Cron target.
  *
- * On Netlify this is a scheduled function (`retry-outstanding.mts`, `@hourly`).
- * Vercel schedules by calling a URL instead, so this is the doorway to the same
- * work: retry confirmation emails and AI summaries that failed earlier, and
- * clear out expired drafts, abandoned upload parts and stale rate-limit rows.
- *
- * The schedule lives in vercel.json.
+ * Retries confirmation emails and AI summaries that failed earlier, and
+ * clears out expired drafts, abandoned upload parts and stale rate-limit
+ * rows. The schedule lives in vercel.json — once daily, since the project
+ * runs on Vercel's Hobby tier, which does not allow a finer-grained cron.
  */
-import runHousekeeping from '../../netlify/functions/retry-outstanding.mts'
+import runHousekeeping from '../../server/functions/retry-outstanding.ts'
 
 export const config = { runtime: 'nodejs', maxDuration: 60 }
 

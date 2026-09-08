@@ -1,17 +1,16 @@
 /**
  * The whole API, as a single Vercel Function.
  *
- * Vercel routes every `/api/*` request here. The handlers themselves are the
- * same modules Netlify deploys — they take a `Request` and return a `Response`,
- * and the only thing they want from the platform is `params`, the caller's IP,
- * and somewhere to hand background work. So the port is this file: match the
- * path, supply those three, call the function.
+ * Vercel routes every `/api/*` request here. The handlers themselves take a
+ * `Request` and return a `Response`, and the only thing they want from the
+ * platform is `params`, the caller's IP, and somewhere to hand background
+ * work — so this file's job is just to match the path and supply those three.
  *
- * `netlify/lib/router.ts` builds the table from each function's own `config`,
- * so the two platforms cannot drift apart.
+ * `server/lib/router.ts` builds the table from each function's own `config`,
+ * so a function is reachable here purely by existing.
  */
 import { waitUntil } from '@vercel/functions'
-import { matchRoute, notFound } from '../netlify/lib/router.ts'
+import { matchRoute, notFound } from '../server/lib/router.ts'
 
 export const config = {
   runtime: 'nodejs',
@@ -43,7 +42,7 @@ export default async function handler(request: Request): Promise<Response> {
     /*
      * Lets the confirmation email and the AI summary finish after the customer
      * already has their reference number, instead of making them wait. Anything
-     * that still fails is picked up by the hourly retry job.
+     * that still fails is picked up by the housekeeping job.
      */
     waitUntil: (promise) => waitUntil(promise),
   })

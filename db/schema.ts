@@ -1,10 +1,9 @@
 /**
- * Netlify Database (Postgres) schema.
+ * Postgres schema.
  *
  * Run `npm run db:generate` after editing this file, then apply the generated
- * SQL in netlify/database/migrations. Nothing here is created at runtime — a
- * function that finds a missing table should fail loudly rather than quietly
- * inventing one.
+ * SQL in db/migrations. Nothing here is created at runtime — a function that
+ * finds a missing table should fail loudly rather than quietly inventing one.
  */
 import { relations, sql } from 'drizzle-orm'
 import {
@@ -103,7 +102,7 @@ export const submissions = pgTable(
      * is what someone typing a reference number expects. It helps hyphenated
      * business names for the same reason.
      *
-     * `admin-projects.mts` builds its query with the identical expression;
+     * `admin-projects.ts` builds its query with the identical expression;
      * they have to match character for character or this index goes unused.
      */
     index('submissions_search_idx').using(
@@ -128,7 +127,7 @@ export const uploadedFiles = pgTable(
     fileName: text('file_name').notNull(),
     contentType: text('content_type').notNull(),
     sizeBytes: integer('size_bytes').notNull(),
-    /** Key in the private Netlify Blobs store. Never exposed to a browser. */
+    /** Key in the private `blob_objects` store. Never exposed to a browser. */
     blobKey: text('blob_key').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -225,12 +224,11 @@ const bytea = customType<{ data: Buffer; driverData: Buffer; default: false }>({
 })
 
 /**
- * Uploaded file contents, and the parts of an upload still in flight.
- *
- * Used wherever Netlify Blobs is not available — see netlify/lib/storage.ts.
- * Keeping bytes here means a deployment needs one service rather than two, and
- * the rows are no more reachable than the rest of the data: every read goes
- * through a function that has already authorised the caller.
+ * Uploaded file contents, and the parts of an upload still in flight — see
+ * server/lib/storage.ts. Keeping bytes here means a deployment needs one
+ * service rather than two, and the rows are no more reachable than the rest
+ * of the data: every read goes through a function that has already
+ * authorised the caller.
  */
 export const blobObjects = pgTable(
   'blob_objects',

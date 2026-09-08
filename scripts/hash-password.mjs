@@ -28,5 +28,5 @@ const salt = randomBytes(16)
 const derived = pbkdf2Sync(password, salt, ITERATIONS, KEY_LENGTH, DIGEST)
 const encoded = `pbkdf2$${DIGEST}$${ITERATIONS}$${salt.toString('base64url')}$${derived.toString('base64url')}`
 
-console.log('\nAdd this to your Netlify environment variables:\n')
+console.log('\nAdd this to your Vercel environment variables:\n')
 console.log(`ADMIN_PASSWORD_HASH=${encoded}\n`)

@@ -1,16 +1,11 @@
 #!/usr/bin/env node
 /**
- * Applies any unapplied migrations from netlify/database/migrations.
+ * Applies any unapplied migrations from db/migrations.
  *
- * NOT part of the Netlify build. Netlify's own database extension runs the
- * files in that directory after the build, using its own migration tracker —
- * so having this run during the build meant two runners with two trackers, and
- * the second one re-ran 0000 and failed the deploy on `relation
- * "checklist_items" already exists`.
- *
- * Netlify owns migrations on deploy. This script is for running them by hand:
- * against a local `netlify dev` database, or against production from a machine
- * that can reach it.
+ * NOT part of the build — Vercel's build only runs `vite build`, so a fresh
+ * database (or a new migration) needs this run by hand: `DATABASE_URL=… npm
+ * run db:migrate`, against a local Postgres or production from a machine that
+ * can reach it.
  *
  * With no database configured it says so and exits cleanly.
  */
@@ -18,27 +13,22 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import pg from 'pg'
 
-const url =
-  process.env.NETLIFY_DATABASE_URL || process.env.NETLIFY_DB_URL || process.env.DATABASE_URL
+const url = process.env.DATABASE_URL
 
 if (!url) {
-  console.log(
-    'No database connection string found (NETLIFY_DATABASE_URL). Skipping migrations.\n' +
-      'Provision Netlify Database, or set the variable, then redeploy.',
-  )
+  console.log('No database connection string found (DATABASE_URL). Skipping migrations.')
   process.exit(0)
 }
 
 const pool = new pg.Pool({
   connectionString: url,
-  // Netlify Database and most managed Postgres require TLS; a local
-  // `netlify dev` instance does not offer it.
+  // Managed Postgres requires TLS; a local instance does not offer it.
   ssl: /localhost|127\.0\.0\.1/.test(url) ? false : { rejectUnauthorized: false },
   max: 1,
 })
 
 try {
-  await migrate(drizzle(pool), { migrationsFolder: 'netlify/database/migrations' })
+  await migrate(drizzle(pool), { migrationsFolder: 'db/migrations' })
   console.log('Database migrations are up to date.')
 } catch (error) {
   console.error('Migration failed:', error)

@@ -22,21 +22,18 @@ so hiding the UI is never the thing keeping data private.
 
 - **Vite 7 + React 19 + TypeScript**, `react-router-dom` 7. The dashboard is
   behind `React.lazy`, so admin code is never in the customer bundle.
-- **One API, two hosts.** The handlers are plain `Request` in, `Response` out.
-  Netlify serves them as v2 functions; Vercel serves them through
-  `api/[...path].ts`. `netlify/lib/router.ts` builds the routing table from each
-  function's own `config`, so neither host can drift from the other.
-- **Netlify Database** (Postgres) via **Drizzle ORM** (stable 0.45). Migrations
-  in `netlify/database/migrations`, applied on deploy by Netlify's own database
-  extension. Every migration must be safe to re-run — see below.
-- **Uploaded files** go to Netlify Blobs on Netlify and to Postgres
-  (`blob_objects`) everywhere else — see `netlify/lib/storage.ts`. Neither is
-  web-addressable: the only way to read a file is through a function that has
-  already authorised the caller.
+- **One Vercel Function serves the whole API.** The handlers are plain
+  `Request` in, `Response` out; `api/[...path].ts` matches every `/api/*`
+  request against the routing table `server/lib/router.ts` builds from each
+  function's own `config`.
+- **Postgres** via **Drizzle ORM** (stable 0.45). Migrations in
+  `db/migrations`, applied by hand with `npm run db:migrate` — see below.
+- **Uploaded files** go to Postgres too (`blob_objects`) — see
+  `server/lib/storage.ts`. The table is never web-addressable: the only way to
+  read a file is through a function that has already authorised the caller.
 - **Claude** (`claude-opus-5` by default, `AI_SUMMARY_MODEL` to override) for
-  project summaries — through Netlify's AI Gateway where it exists, otherwise a
-  plain `ANTHROPIC_API_KEY`. Without either, submission still succeeds and the
-  summary is marked pending.
+  project summaries, via a plain `ANTHROPIC_API_KEY`. Without one, submission
+  still succeeds and the summary is marked pending.
 - **Resend or SMTP** for the confirmation email.
 
 ## Layout
@@ -49,9 +46,10 @@ shared/questionnaire.ts   Single source of truth for all 7 sections and every qu
                           here and it appears everywhere.
 db/schema.ts              Drizzle schema: submissions, uploaded_files, upload_sessions,
                           internal_notes, checklist_items, rate_limits.
-netlify/lib/              Shared server code — http, auth, session, answers, uploads,
+db/migrations/            SQL migrations, applied by hand with `npm run db:migrate`.
+server/lib/               Shared server code — http, auth, session, answers, uploads,
                           email, ai, tasks.
-netlify/functions/        15 functions. Routes are declared in each file's
+server/functions/         15 functions. Routes are declared in each file's
                           `export const config`.
 api/                      Vercel entry points: the catch-all, and the cron target.
 scripts/                  hash-password, migrate, and the test harnesses.
@@ -97,8 +95,8 @@ POST   /api/admin/projects/:id/summary regenerate the AI summary
 POST   /api/admin/projects/:id/email   resend the confirmation email
 ```
 
-`retry-outstanding.mts` runs `@hourly` and retries summaries and emails that
-failed earlier.
+`retry-outstanding.ts` runs once a day, via the Vercel Cron target at
+`api/cron/retry.ts`, and retries summaries and emails that failed earlier.
 
 ## Design decisions worth knowing before you change things
 
@@ -110,7 +108,7 @@ failed earlier.
   6MB. The 20MB per-file limit is enforced on the client, at `init`, at each
   chunk, and again on the assembled file. Content type is confirmed by reading
   magic bytes, not by trusting the browser.
-- **Answers are normalised server-side** (`netlify/lib/answers.ts`). Unknown
+- **Answers are normalised server-side** (`server/lib/answers.ts`). Unknown
   keys are dropped, so a stored answer document cannot smuggle arbitrary data
   into a record. File attachments live in `uploaded_files`, never in `answers`.
 - **Submission never fails because something downstream did.** A failed AI
@@ -127,26 +125,25 @@ failed earlier.
 
 ```bash
 npm install
-cp .env.example .env      # then fill in SESSION_SECRET and the ADMIN_* values
+cp .env.example .env      # then fill in DATABASE_URL, SESSION_SECRET and the ADMIN_* values
 npm run hash-password -- "your admin password"   # → ADMIN_PASSWORD_HASH
-netlify dev --port 8889
+npm run db:migrate        # apply the schema to that database
+npm run build && npm run start:local
 ```
 
-Without the Netlify CLI, `npm run build && npm run start:local` serves the same
-thing on :8888: `scripts/local-server.mjs` dispatches `/api/*` to the same
-function modules Netlify deploys, using each one's declared `config.path`. It is
-a convenience for testing, not a second runtime — `netlify dev` remains the
-supported way to run this.
+`scripts/local-server.mjs` serves the built site on :8888 and dispatches
+`/api/*` to `api/[...path].ts` — the same entry point Vercel calls — so this
+runs the deployed code path, not a stand-in.
 
-`netlify dev` provides the database, blob store and AI gateway locally. Note the
-`PGUSER=postgres` line in `.env.example`: the local connection string omits a
-username, and functions fail with `user is required` without it. It is not
-needed in production.
+You need your own Postgres database (a local instance, or a free-tier Neon
+one) — nothing provisions one for you locally. If it's a local instance with
+no password, set `PGUSER=postgres` (see `.env.example`): otherwise functions
+fail with `user is required`. Not needed in production.
 
 ```bash
 npm run typecheck    # tsc across the app and the server
 npm run db:generate  # new migration after editing db/schema.ts
-npm run db:migrate   # apply migrations by hand (Netlify does this itself on deploy)
+npm run db:migrate   # apply migrations by hand — never run by the build
 ```
 
 ## Tests
@@ -155,25 +152,20 @@ Three harnesses, all running against real infrastructure rather than mocks.
 
 ```bash
 npm test             # typecheck + the API suite
-npm run test:api     # 127 checks: every endpoint, against Postgres and a real blob store
+npm run test:api     # 127 checks: every endpoint, against a real Postgres database
 npm run test:email   # sends the confirmation through a throwaway SMTP server
 npm run test:browser # drives the whole thing in Chromium, phone and desktop
 ```
 
-`test:api` and `test:email` need `NETLIFY_DATABASE_URL` and the `ADMIN_*`
-variables. `test:browser` additionally needs `npm run start:local` running, and
-writes screenshots to `.screenshots/`.
+`test:api` and `test:email` need `DATABASE_URL` and the `ADMIN_*` variables.
+`test:browser` additionally needs `npm run start:local` running, and writes
+screenshots to `.screenshots/`.
 
 ## Deploying
 
-The same commit deploys to either host. Both build with `npm run build` and
-publish `dist/`.
-
-### Vercel
-
-`vercel.json` sets the build, the single-page-app rewrite, the security headers
-and the hourly cron. Provision a Postgres database (Neon's free tier is enough)
-and set:
+Vercel is the only supported host. `vercel.json` sets the build, the
+single-page-app rewrite, the security headers and the cron. Provision a
+Postgres database (Neon's free tier is enough) and set:
 
 | Variable | Needed for |
 | --- | --- |
@@ -190,35 +182,18 @@ rest degrade gracefully and are reported in the dashboard.
 Migrations are not run by the build. Apply them once with
 `DATABASE_URL=… npm run db:migrate`.
 
-### Netlify
+The cron in `vercel.json` runs once a day (`0 3 * * *`) rather than hourly,
+because Vercel's Hobby tier only allows daily cron schedules — a finer
+schedule needs the Pro plan.
 
-Connect the repository to Netlify and set the environment variables from
-`.env.example` under **Site configuration → Environment variables**. The
-database, blob store and AI gateway are provisioned by the platform;
-`NETLIFY_DATABASE_URL` and `ANTHROPIC_API_KEY` are injected automatically and
-should not be set by hand.
+### Migrations should stay safe to re-run
 
-### Migrations must be idempotent
-
-Netlify's database extension runs the files in `netlify/database/migrations`
-itself, after the build. Its migration tracker is separate from Drizzle's, so a
-migration Drizzle has already applied can still be presented to Netlify as
-pending.
-
-That is not hypothetical: the build command used to run `npm run db:migrate`
-too, so 0000 ran twice, the second run hit
-`relation "checklist_items" already exists`, and the deploy failed even though
-the build had succeeded.
-
-So: **Netlify owns migrations on deploy, and every migration is written to be
-safe to re-run.** After `npm run db:generate`, edit the generated SQL to add the
-guards — `CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, and a
+Nothing re-applies a migration automatically, but `npm run db:migrate` can
+still be run more than once by hand, so each migration file uses
+`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, and a
 `DO $$ ... EXCEPTION WHEN duplicate_object THEN null; END $$;` block around each
 `ADD CONSTRAINT`, since Postgres has no `IF NOT EXISTS` for those.
 `0000_initial_schema.sql` is the worked example.
-
-`npm run db:migrate` remains for applying migrations by hand — locally, or
-against production from a machine that can reach it.
 
 ### One thing to replace
 
