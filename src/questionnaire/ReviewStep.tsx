@@ -122,7 +122,7 @@ export function ReviewStep({ questionnaire }: ReviewStepProps) {
       ) : null}
 
       {submitError ? (
-        <Notice tone="error" title="We could not send your questionnaire">
+        <Notice tone="error" title="We could not send your enquiry">
           {submitError}
         </Notice>
       ) : null}
@@ -140,7 +140,7 @@ export function ReviewStep({ questionnaire }: ReviewStepProps) {
               Sending…
             </>
           ) : (
-            'Submit Questionnaire'
+            'Submit Project Enquiry'
           )}
         </button>
         <button

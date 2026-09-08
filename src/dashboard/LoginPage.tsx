@@ -46,7 +46,7 @@ export function LoginPage({ configError, onSignedIn }: LoginPageProps) {
             <p className="eyebrow">NexalField internal</p>
             <h1 style={{ fontSize: '1.7rem' }}>Project dashboard</h1>
             <p className="help">
-              This area is for NexalField staff only. Customer questionnaires and uploaded files are
+              This area is for NexalField staff only. Customer enquiries and uploaded files are
               private.
             </p>
           </div>

@@ -9,8 +9,9 @@
 import { and, eq, inArray, isNotNull, lt, or, sql } from 'drizzle-orm'
 import { submissions, uploadedFiles, type Submission } from '../../db/schema.ts'
 import { generateProjectSummary } from './ai.ts'
+import { configuredAdmins } from './auth.ts'
 import { getDb } from './db.ts'
-import { emailIsConfigured, sendConfirmationEmail } from './email.ts'
+import { emailIsConfigured, sendAdminNotification, sendConfirmationEmail } from './email.ts'
 
 /** Regenerates and stores the project brief. Never throws. */
 export async function runSummaryTask(submissionId: string): Promise<void> {
@@ -128,6 +129,39 @@ export async function runEmailTask(submissionId: string): Promise<void> {
 }
 
 /**
+ * Tells NexalField a new enquiry has come in. A courtesy notification, not a
+ * durable one: it is attempted once, right after submission, and — unlike the
+ * customer confirmation — is not tracked on the record or retried hourly. The
+ * enquiry itself is never at risk either way; it is already saved.
+ */
+export async function runAdminNotificationTask(submissionId: string): Promise<void> {
+  if (!emailIsConfigured()) return
+
+  const admins = configuredAdmins()
+  if (admins.length === 0) return
+
+  const db = getDb()
+  const [submission] = await db
+    .select()
+    .from(submissions)
+    .where(eq(submissions.id, submissionId))
+    .limit(1)
+  if (!submission || !submission.reference) return
+
+  for (const admin of admins) {
+    const outcome = await sendAdminNotification({
+      to: admin.email,
+      customerName: submission.contactName ?? '',
+      customerEmail: submission.email ?? '',
+      reference: submission.reference,
+    })
+    if (outcome.status === 'failed') {
+      console.error('Admin notification email failed for', admin.email, outcome.error)
+    }
+  }
+}
+
+/**
  * Kicks off the post-submission work.
  *
  * `waitUntil` lets the response reach the customer immediately while the
@@ -142,6 +176,9 @@ export function scheduleFollowUp(
   const work = (async () => {
     await runEmailTask(submissionId).catch((error) =>
       console.error('Confirmation email task failed:', error),
+    )
+    await runAdminNotificationTask(submissionId).catch((error) =>
+      console.error('Admin notification task failed:', error),
     )
     await runSummaryTask(submissionId).catch((error) =>
       console.error('Summary task failed:', error),

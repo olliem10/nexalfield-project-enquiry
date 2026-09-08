@@ -199,7 +199,7 @@ export function statusLabel(status: string): string {
 }
 
 export const CHECKLIST_ITEMS: { key: string; label: string }[] = [
-  { key: 'questionnaire_reviewed', label: 'Questionnaire Reviewed' },
+  { key: 'questionnaire_reviewed', label: 'Project Enquiry Reviewed' },
   { key: 'content_gathered', label: 'Content Gathered' },
   { key: 'design_started', label: 'Design Started' },
   { key: 'first_version_complete', label: 'First Version Complete' },

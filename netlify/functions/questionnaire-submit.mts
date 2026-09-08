@@ -67,7 +67,7 @@ export default handle(async (request: Request, context: Context) => {
     throw new HttpError(
       422,
       'validation_failed',
-      'A few answers still need attention before we can accept the questionnaire.',
+      'A few answers still need attention before we can accept the enquiry.',
       problems,
     )
   }

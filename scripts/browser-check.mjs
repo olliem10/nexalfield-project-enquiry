@@ -82,13 +82,13 @@ page.on('requestfailed', (request) => {
 
 await page.goto(`${BASE}/questionnaire`, { waitUntil: 'networkidle' })
 
-check('the intro screen renders', await page.getByRole('heading', { name: 'Website Project Questionnaire' }).isVisible())
+check('the intro screen renders', await page.getByRole('heading', { name: 'Website Project Enquiry' }).isVisible())
 check('the NexalField masthead is present', await page.locator('.masthead .brand-name').isVisible())
 check('"What Happens Next?" is on the intro', await page.getByText('What Happens Next?').first().isVisible())
 
 // The six promised steps.
 for (const step of [
-  'We review your questionnaire',
+  'We review your enquiry',
   'We plan your website',
   'We contact you if we need clarification',
   'We create the first version',
@@ -107,7 +107,7 @@ const overflows = async () =>
   page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)
 check('the intro does not scroll sideways', !(await overflows()))
 
-await page.getByRole('button', { name: 'Start Questionnaire' }).click()
+await page.getByRole('button', { name: 'Start Project Enquiry' }).click()
 await page.waitForSelector('.progress-panel')
 
 check('step 1 of 7 is shown', (await page.locator('.progress-step').innerText()).includes('Step 1 of 7'))
@@ -246,7 +246,7 @@ check('every section can be edited', (await page.locator('.review-head button:ha
 check('the customer sees their own answers back', await page.getByText('Harrow Lane Joinery').first().isVisible())
 check('the uploaded file is listed on the review', await page.getByText('logo.png').first().isVisible())
 
-const submitDisabled = await page.getByRole('button', { name: 'Submit Questionnaire' }).isDisabled()
+const submitDisabled = await page.getByRole('button', { name: 'Submit Project Enquiry' }).isDisabled()
 check('submit is blocked until the agreement is ticked', submitDisabled === false || submitDisabled === true)
 
 await page.screenshot({ path: `${SHOTS}mobile-6-review.png`, fullPage: true })
@@ -272,14 +272,14 @@ const agreementOnReview = page.locator('.card #agreement')
 if (!(await agreementOnReview.isChecked())) await agreementOnReview.check()
 check('the review carries the agreement across from step 7', await agreementOnReview.isChecked())
 await page.waitForTimeout(400)
-await page.getByRole('button', { name: 'Submit Questionnaire' }).click()
+await page.getByRole('button', { name: 'Submit Project Enquiry' }).click()
 
 await page.waitForSelector('.reference-plate', { timeout: 20000 })
 const reference = await page.locator('.reference-plate .mono').innerText()
 check('the thank-you page appears', await page.getByRole('heading', { name: 'Thank You' }).isVisible())
 check(`a reference number is shown (${reference})`, /^NEX-\d{4,5}$/.test(reference))
 check('the expected review time is stated', await page.getByText('1–2 business days').isVisible())
-check('receipt is confirmed', await page.getByText(/questionnaire has been received/i).first().isVisible())
+check('receipt is confirmed', await page.getByText(/enquiry has been received/i).first().isVisible())
 
 await page.screenshot({ path: `${SHOTS}mobile-7-thankyou.png`, fullPage: true })
 check('the thank-you page does not scroll sideways', !(await overflows()))
@@ -371,14 +371,14 @@ await admin.waitForTimeout(1200)
 /* Open the record. */
 await admin.locator('.project-row').first().click()
 await admin.waitForSelector('.record-grid', { timeout: 12000 })
-check('the customer record opens', await admin.getByText('Questionnaire').first().isVisible())
+check('the customer record opens', await admin.getByText('Project Enquiry').first().isVisible())
 check('the full questionnaire is shown', await admin.getByText('Bespoke fitted furniture').first().isVisible())
 check('the uploaded file is listed', await admin.getByText('logo.png').first().isVisible())
 check('contact details are shown', await admin.getByText('jane@harrowlane.test').first().isVisible())
 check('the project checklist is present', (await admin.locator('.checklist-item').count()) === 7)
 
 for (const item of [
-  'Questionnaire Reviewed',
+  'Project Enquiry Reviewed',
   'Content Gathered',
   'Design Started',
   'First Version Complete',

@@ -24,7 +24,7 @@ export default handle(async (request: Request, context: Context) => {
     throw new HttpError(
       409,
       'already_submitted',
-      'This questionnaire has already been sent, so its files can no longer be changed.',
+      'This enquiry has already been sent, so its files can no longer be changed.',
     )
   }
 

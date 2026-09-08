@@ -14,6 +14,16 @@
  * already authorised the caller. The trade is database size. A logo and a few
  * photos per customer is nothing; if this ever stores thousands of large
  * images, move that bucket to real object storage and only this file changes.
+ *
+ * `getStream` exists alongside the buffered `get` for one reason: serving a
+ * file back to the dashboard. Netlify Blobs hands over a real stream straight
+ * from the store, so a 20MB photo never sits fully in this function's memory
+ * on its way out. The Postgres backend still reads the row in one round trip
+ * (there is no partial/range read on a single `bytea` column without a much
+ * bigger change than this fix calls for), but the response to the browser is
+ * still a genuine streamed `Response` rather than one large buffered body —
+ * which is what lets it clear a serverless host's response-size ceiling for
+ * buffered responses in the first place.
  */
 import { getStore } from '@netlify/blobs'
 import { and, eq, lt } from 'drizzle-orm'
@@ -24,6 +34,8 @@ import { getDb } from './db.ts'
 export interface ObjectStore {
   put(key: string, bytes: Uint8Array): Promise<void>
   get(key: string): Promise<Uint8Array | null>
+  /** For serving a file back out. See the file-level comment above. */
+  getStream(key: string): Promise<ReadableStream<Uint8Array> | null>
   delete(key: string): Promise<void>
 }
 
@@ -57,6 +69,11 @@ function netlifyStore(bucket: Bucket): ObjectStore {
       const value = await store.get(key, { type: 'arrayBuffer' })
       return value ? new Uint8Array(value) : null
     },
+    async getStream(key) {
+      // Genuinely streamed: this never pulls the whole file into memory here.
+      const value = await store.get(key, { type: 'stream' })
+      return value ?? null
+    },
     async delete(key) {
       await store.delete(key)
     },
@@ -67,7 +84,35 @@ function netlifyStore(bucket: Bucket): ObjectStore {
  * Postgres
  * ------------------------------------------------------------------ */
 
+/** 64KB pieces are small enough to keep peak memory bounded while streaming out. */
+const STREAM_CHUNK_BYTES = 64 * 1024
+
+function bytesToStream(bytes: Uint8Array): ReadableStream<Uint8Array> {
+  let offset = 0
+  return new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (offset >= bytes.byteLength) {
+        controller.close()
+        return
+      }
+      const end = Math.min(offset + STREAM_CHUNK_BYTES, bytes.byteLength)
+      controller.enqueue(bytes.subarray(offset, end))
+      offset = end
+    },
+  })
+}
+
 function postgresStore(bucket: Bucket): ObjectStore {
+  async function fetchBytes(key: string): Promise<Uint8Array | null> {
+    const db = getDb()
+    const [row] = await db
+      .select({ bytes: blobObjects.bytes })
+      .from(blobObjects)
+      .where(and(eq(blobObjects.bucket, bucket), eq(blobObjects.key, key)))
+      .limit(1)
+    return row ? new Uint8Array(row.bytes) : null
+  }
+
   return {
     async put(key, bytes) {
       const db = getDb()
@@ -81,14 +126,11 @@ function postgresStore(bucket: Bucket): ObjectStore {
         })
     },
 
-    async get(key) {
-      const db = getDb()
-      const [row] = await db
-        .select({ bytes: blobObjects.bytes })
-        .from(blobObjects)
-        .where(and(eq(blobObjects.bucket, bucket), eq(blobObjects.key, key)))
-        .limit(1)
-      return row ? new Uint8Array(row.bytes) : null
+    get: fetchBytes,
+
+    async getStream(key) {
+      const bytes = await fetchBytes(key)
+      return bytes ? bytesToStream(bytes) : null
     },
 
     async delete(key) {

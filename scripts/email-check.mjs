@@ -68,8 +68,11 @@ delete process.env.RESEND_API_KEY
  * Send through the real task
  * ---------------------------------------------------------------- */
 
+process.env.ADMIN_EMAIL = 'ollie@nexalfield.com'
+process.env.ADMIN_NAME = 'Ollie'
+
 const { CONFIRMATION_SUBJECT } = await import('../netlify/lib/email.ts')
-const { runEmailTask } = await import('../netlify/lib/tasks.ts')
+const { runEmailTask, runAdminNotificationTask } = await import('../netlify/lib/tasks.ts')
 const { getDb } = await import('../netlify/lib/db.ts')
 const { submissions } = await import('../db/schema.ts')
 const { eq, isNotNull } = await import('drizzle-orm')
@@ -87,6 +90,7 @@ if (!record) {
 }
 
 await runEmailTask(record.id)
+await runAdminNotificationTask(record.id)
 
 const [after] = await db
   .select()
@@ -106,13 +110,15 @@ const check = (name, condition, detail = '') => {
   if (!condition) failed += 1
 }
 
-const body = received[0] ?? ''
-const decoded = body.replace(/=\r\n/g, '').replace(/=([0-9A-F]{2})/g, (_, hex) =>
-  String.fromCharCode(parseInt(hex, 16)),
-)
+const decode = (raw) =>
+  raw.replace(/=\r\n/g, '').replace(/=([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+
+const confirmation = received.find((raw) => decode(raw).includes(record.email))
+const notification = received.find((raw) => decode(raw).includes('ollie@nexalfield.com'))
+const decoded = decode(confirmation ?? '')
 
 console.log('\n[1mConfirmation email[0m')
-check('exactly one message was delivered', received.length === 1, `got ${received.length}`)
+check('exactly two messages were delivered', received.length === 2, `got ${received.length}`)
 check('the record is marked sent', after.emailStatus === 'sent', after.emailStatus ?? after.emailError ?? '')
 check('the provider is recorded', after.emailProvider === 'smtp')
 check('the sent time is recorded', after.emailSentAt instanceof Date)
@@ -120,13 +126,22 @@ check(`the subject is "${CONFIRMATION_SUBJECT}"`, decoded.includes(`Subject: ${C
 check('it is addressed to the customer', decoded.includes(record.email))
 check('it greets them by name', decoded.includes(`Hi ${record.contactName},`))
 check('it carries the reference number', decoded.includes(record.reference))
-check('it thanks them for the questionnaire', decoded.includes('Thank you for completing the NexalField Website Project Questionnaire'))
+check('it thanks them for the enquiry', decoded.includes('Thank you for completing the NexalField Website Project Enquiry'))
 check('it confirms receipt', decoded.includes('We have successfully received your information'))
 check('it says we will be in touch', decoded.includes('We will contact you if we need any additional information'))
 check('it signs off from Ollie at NexalField', decoded.includes('Ollie') && decoded.includes('NexalField'))
 check('it sends from the configured address', decoded.includes('onboarding@nexalfield.com'))
 check('replies go to the configured address', decoded.includes('nexalfield@gmail.com'))
 check('both a plain-text and an HTML part are present', decoded.includes('text/plain') && decoded.includes('text/html'))
+
+console.log('\n[1mAdmin notification email[0m')
+const notifDecoded = decode(notification ?? '')
+check('a notification was sent to the admin', Boolean(notification))
+check('it is addressed to the configured admin', notifDecoded.includes('ollie@nexalfield.com'))
+check('it carries the reference number', notifDecoded.includes(record.reference))
+check('it names the customer', notifDecoded.includes(record.contactName ?? ''))
+check('it carries the customer email', notifDecoded.includes(record.email ?? ''))
+check('it points to the dashboard', notifDecoded.includes('Sign in to the dashboard'))
 
 console.log(failed === 0 ? '\n[1mEmail delivery verified[0m' : `\n[31m${failed} failed[0m`)
 process.exit(failed === 0 ? 0 : 1)

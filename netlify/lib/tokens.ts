@@ -31,7 +31,7 @@ function readToken(request: Request): string {
     throw new HttpError(
       401,
       'missing_token',
-      'We could not identify your questionnaire. Please reopen your continuation link.',
+      'We could not identify your enquiry. Please reopen your continuation link.',
     )
   }
   return token
@@ -59,7 +59,7 @@ export async function loadSubmissionByToken(request: Request): Promise<Submissio
     throw new HttpError(
       404,
       'not_found',
-      'We could not find that saved questionnaire. It may have already been submitted from another device.',
+      'We could not find that saved enquiry. It may have already been submitted from another device.',
     )
   }
 
@@ -71,7 +71,7 @@ export async function loadSubmissionByToken(request: Request): Promise<Submissio
     throw new HttpError(
       410,
       'expired',
-      'Your saved questionnaire has expired. You can start a new one — it only takes 10–15 minutes.',
+      'Your saved enquiry has expired. You can start a new one — it only takes 10–15 minutes.',
     )
   }
 

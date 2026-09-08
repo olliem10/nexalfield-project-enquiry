@@ -23,7 +23,7 @@ export default handle(async (request: Request, context: Context) => {
     throw new HttpError(
       409,
       'not_submitted',
-      'This questionnaire has not been submitted yet, so there is no summary.',
+      'This enquiry has not been submitted yet, so there is no summary.',
     )
   }
 

@@ -19,11 +19,11 @@ function NotFound() {
           <p className="eyebrow">Page not found</p>
           <h1>We could not find that page</h1>
           <p className="lede">
-            The link may be incomplete. You can pick up the website project questionnaire below.
+            The link may be incomplete. You can pick up the website project enquiry below.
           </p>
           <p>
             <a className="btn btn-primary" href="/questionnaire">
-              Go to the questionnaire
+              Go to the enquiry
             </a>
           </p>
         </div>
