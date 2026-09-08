@@ -71,9 +71,9 @@ delete process.env.RESEND_API_KEY
 process.env.ADMIN_EMAIL = 'ollie@nexalfield.com'
 process.env.ADMIN_NAME = 'Ollie'
 
-const { CONFIRMATION_SUBJECT } = await import('../netlify/lib/email.ts')
-const { runEmailTask, runAdminNotificationTask } = await import('../netlify/lib/tasks.ts')
-const { getDb } = await import('../netlify/lib/db.ts')
+const { CONFIRMATION_SUBJECT } = await import('../server/lib/email.ts')
+const { runEmailTask, runAdminNotificationTask } = await import('../server/lib/tasks.ts')
+const { getDb } = await import('../server/lib/db.ts')
 const { submissions } = await import('../db/schema.ts')
 const { eq, isNotNull } = await import('drizzle-orm')
 

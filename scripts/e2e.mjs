@@ -1,7 +1,7 @@
 /**
- * End-to-end exercise of the real functions against a real Postgres and a real
- * (local) blob store. Nothing is mocked except the transport: each function's
- * default export is invoked exactly as Netlify invokes it.
+ * End-to-end exercise of the real functions against a real Postgres. Nothing
+ * is mocked except the transport: each function's default export is invoked
+ * exactly as `api/[...path].ts` invokes it.
  *
  *   node --experimental-strip-types scripts/e2e.mjs
  */
@@ -12,9 +12,8 @@
  * ---------------------------------------------------------------- */
 
 /*
- * No blob server: outside Netlify the object store is Postgres, which is
- * exactly what Vercel will use, so uploads are exercised through the same
- * backend the deployment uses.
+ * Uploads are exercised through the same Postgres-backed object store the
+ * deployment uses — see server/lib/storage.ts.
  */
 /* ---------------------------------------------------------------- *
  * Test plumbing
@@ -41,7 +40,7 @@ function section(title) {
 
 const BASE = 'http://localhost:8888'
 
-/** Invokes a function the way Netlify does: a Request plus a Context. */
+/** Invokes a function the way `api/[...path].ts` does: a Request plus a HandlerContext. */
 async function call(handler, { method = 'GET', path = '/', body, headers = {}, params = {}, cookies = '' } = {}) {
   const init = { method, headers: { ...headers } }
   if (cookies) init.headers.cookie = cookies
@@ -81,21 +80,21 @@ const flush = async () => {
  * Load the real modules
  * ---------------------------------------------------------------- */
 
-const sessionFn = (await import('../netlify/functions/questionnaire-session.mts')).default
-const submitFn = (await import('../netlify/functions/questionnaire-submit.mts')).default
-const summaryFn = (await import('../netlify/functions/questionnaire-summary.mts')).default
-const initFn = (await import('../netlify/functions/uploads-init.mts')).default
-const chunkFn = (await import('../netlify/functions/uploads-chunk.mts')).default
-const completeFn = (await import('../netlify/functions/uploads-complete.mts')).default
-const deleteFileFn = (await import('../netlify/functions/uploads-delete.mts')).default
-const authFn = (await import('../netlify/functions/admin-auth.mts')).default
-const projectsFn = (await import('../netlify/functions/admin-projects.mts')).default
-const projectFn = (await import('../netlify/functions/admin-project.mts')).default
-const notesFn = (await import('../netlify/functions/admin-notes.mts')).default
-const checklistFn = (await import('../netlify/functions/admin-checklist.mts')).default
-const adminFileFn = (await import('../netlify/functions/admin-file.mts')).default
-const actionsFn = (await import('../netlify/functions/admin-actions.mts')).default
-const retryFn = (await import('../netlify/functions/retry-outstanding.mts')).default
+const sessionFn = (await import('../server/functions/questionnaire-session.ts')).default
+const submitFn = (await import('../server/functions/questionnaire-submit.ts')).default
+const summaryFn = (await import('../server/functions/questionnaire-summary.ts')).default
+const initFn = (await import('../server/functions/uploads-init.ts')).default
+const chunkFn = (await import('../server/functions/uploads-chunk.ts')).default
+const completeFn = (await import('../server/functions/uploads-complete.ts')).default
+const deleteFileFn = (await import('../server/functions/uploads-delete.ts')).default
+const authFn = (await import('../server/functions/admin-auth.ts')).default
+const projectsFn = (await import('../server/functions/admin-projects.ts')).default
+const projectFn = (await import('../server/functions/admin-project.ts')).default
+const notesFn = (await import('../server/functions/admin-notes.ts')).default
+const checklistFn = (await import('../server/functions/admin-checklist.ts')).default
+const adminFileFn = (await import('../server/functions/admin-file.ts')).default
+const actionsFn = (await import('../server/functions/admin-actions.ts')).default
+const retryFn = (await import('../server/functions/retry-outstanding.ts')).default
 
 const { CHECKLIST_ITEMS, completionPercent, TOTAL_STEPS } = await import(
   '../shared/questionnaire.ts'
@@ -799,14 +798,7 @@ check('the hourly job runs', housekeeping.status === 200)
 section('11. Persistence')
 
 const { Client } = await import('pg')
-// Resolved the way the application resolves it, so the suite runs against
-// either a Netlify- or a Vercel-shaped environment.
-const client = new Client({
-  connectionString:
-    process.env.DATABASE_URL ||
-    process.env.NETLIFY_DATABASE_URL ||
-    process.env.NETLIFY_DB_URL,
-})
+const client = new Client({ connectionString: process.env.DATABASE_URL })
 await client.connect()
 const rows = await client.query(
   'select reference, status, business_name, email, submitted_at from submissions where reference = $1',

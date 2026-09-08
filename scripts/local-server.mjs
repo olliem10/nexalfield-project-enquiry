@@ -3,11 +3,9 @@
  *
  * `/api/*` goes through `api/[...path].ts` — the same entry point Vercel calls,
  * so what is tested here is the deployed code path rather than a stand-in.
- * Everything else is served from `dist/`, with the single-page-app fallback
- * that vercel.json and netlify.toml both declare.
- *
- * Netlify Blobs is unavailable outside Netlify, so uploads use the Postgres
- * backend here, exactly as they will on Vercel.
+ * Everything else is served from `dist/`, with the same single-page-app
+ * fallback vercel.json declares — hand-written here since this server does
+ * not go through Vercel's own rewrite engine.
  */
 import { createServer } from 'node:http'
 import { existsSync } from 'node:fs'
@@ -18,7 +16,7 @@ const PORT = Number(process.env.PORT ?? 8888)
 const DIST = new URL('../dist/', import.meta.url).pathname
 
 const { default: api } = await import('../api/[...path].ts')
-const { ROUTES } = await import('../netlify/lib/router.ts')
+const { ROUTES } = await import('../server/lib/router.ts')
 
 /* ---------------------------------------------------------------- *
  * Static files

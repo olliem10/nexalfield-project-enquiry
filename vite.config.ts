@@ -4,8 +4,8 @@ import { defineConfig } from 'vite'
 
 /**
  * The `@shared` alias points at the questionnaire definition that the browser,
- * the Netlify Functions and the AI prompt all read from. Keeping one copy is
- * the whole reason the wizard, validation and dashboard never drift apart.
+ * the API functions and the AI prompt all read from. Keeping one copy is the
+ * whole reason the wizard, validation and dashboard never drift apart.
  */
 export default defineConfig({
   plugins: [react()],
