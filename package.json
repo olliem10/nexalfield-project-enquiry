@@ -1,0 +1,43 @@
+{
+  "name": "nexalfield-project-enquiry",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run db:migrate && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --force",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node scripts/migrate.mjs",
+    "hash-password": "node scripts/hash-password.mjs",
+    "start:local": "node --experimental-strip-types scripts/local-server.mjs",
+    "test": "npm run typecheck && npm run test:api",
+    "test:api": "node --experimental-strip-types scripts/e2e.mjs",
+    "test:email": "node --experimental-strip-types scripts/email-check.mjs",
+    "test:browser": "node scripts/browser-check.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.4"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.124.0",
+    "@netlify/blobs": "^10.0.9",
+    "@netlify/database": "^1.0.6",
+    "@netlify/functions": "^5.1.0",
+    "@types/node": "^22.18.9",
+    "@types/nodemailer": "^7.0.4",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1",
+    "@vitejs/plugin-react": "^5.0.4",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "nodemailer": "^7.0.9",
+    "pg": "^8.13.0",
+    "playwright": "^1.63.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9"
+  }
+}
