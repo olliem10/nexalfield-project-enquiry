@@ -10,6 +10,13 @@
 html {
   -webkit-text-size-adjust: 100%;
   /*
+   * Keeps anything scrolled to — a focused field, a validation error, an
+   * anchor — clear of the sticky progress panel and the fixed bottom nav.
+   * Without this the browser parks a tabbed-to input underneath them.
+   */
+  scroll-padding-top: calc(var(--sticky-top) + 16px);
+  scroll-padding-bottom: 96px;
+  /*
    * Deliberately not `scroll-behavior: smooth`. The wizard positions the page
    * itself when a step changes or a validation error needs bringing into view,
    * and does so with `behavior: 'auto'` on purpose — an animated scroll racing
@@ -71,6 +78,17 @@ ul,
 ol {
   margin: 0;
   padding: 0;
+}
+
+/*
+ * Description lists carry a UA default of `dd { margin-left: 40px }` and
+ * `dl { margin-block: 1em }`. Both survived into the review page and the
+ * dashboard record, indenting every answer away from its own label and
+ * stealing 40px of width from the value column on each row.
+ */
+dl,
+dd {
+  margin: 0;
 }
 
 a {
@@ -160,7 +178,8 @@ textarea {
  * Text helpers
  * ------------------------------------------------------------------ */
 .eyebrow {
-  font-size: 0.74rem;
+  /* 12.5px — under 12px is uncomfortable on a phone, and this is a label. */
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.13em;
   text-transform: uppercase;

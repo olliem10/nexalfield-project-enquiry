@@ -279,7 +279,7 @@ const reference = await page.locator('.reference-plate .mono').innerText()
 check('the thank-you page appears', await page.getByRole('heading', { name: 'Thank You' }).isVisible())
 check(`a reference number is shown (${reference})`, /^NEX-\d{4,5}$/.test(reference))
 check('the expected review time is stated', await page.getByText('1–2 business days').isVisible())
-check('receipt is confirmed', await page.getByText(/received your project questionnaire/i).isVisible())
+check('receipt is confirmed', await page.getByText(/questionnaire has been received/i).first().isVisible())
 
 await page.screenshot({ path: `${SHOTS}mobile-7-thankyou.png`, fullPage: true })
 check('the thank-you page does not scroll sideways', !(await overflows()))
@@ -336,11 +336,21 @@ await admin.screenshot({ path: `${SHOTS}desktop-2-projects.png`, fullPage: true 
 await admin.fill('#project-search', 'Okafor')
 await admin.getByRole('button', { name: 'Search', exact: true }).click()
 await admin.waitForTimeout(1200)
-check('searching by customer name finds the project', (await admin.locator('.project-row').count()) === 1)
+/*
+ * Asserts the record is found, not that it is the only match. Other suites
+ * share this database and seed customers with the same contact name, so an
+ * exact count tests the fixture rather than the search.
+ */
+check(
+  'searching by customer name finds the project',
+  (await admin.locator('.project-row').count()) >= 1 &&
+    (await admin.getByText(reference).count()) > 0,
+)
 
 await admin.fill('#project-search', reference)
 await admin.getByRole('button', { name: 'Search', exact: true }).click()
 await admin.waitForTimeout(1200)
+// A reference is unique, so this one genuinely should return exactly one row.
 check('searching by reference number finds the project', (await admin.locator('.project-row').count()) === 1)
 
 await admin.fill('#project-search', 'nothing-matches-this')

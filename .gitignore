@@ -21,3 +21,6 @@ Thumbs.db
 
 # Screenshots produced by scripts/browser-check.mjs
 .screenshots
+
+# Raw UI audit output (kept pairs live in docs/ui-audit)
+.audit

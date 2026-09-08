@@ -159,6 +159,13 @@ export function useQuestionnaire() {
       storeToken(created.token)
       applySession(created.session)
       setPhase('wizard')
+      /*
+       * The Start button sits well down the intro, and swapping to the wizard
+       * leaves that scroll position in place — which dropped the customer past
+       * the section heading and into the middle of step 1. Every other move
+       * between steps already returns to the top; starting should too.
+       */
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }))
     } catch (error) {
       setStartError(
         error instanceof ApiError
