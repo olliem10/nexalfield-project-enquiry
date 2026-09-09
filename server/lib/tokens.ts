@@ -8,9 +8,9 @@
  */
 import { createHash, randomBytes } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { submissions, type Submission } from '../../db/schema.ts'
-import { getDb } from './db.ts'
-import { HttpError } from './http.ts'
+import { submissions, type Submission } from '../../db/schema.js'
+import { getDb } from './db.js'
+import { HttpError } from './http.js'
 
 export const RESUME_HEADER = 'x-nexalfield-resume'
 /** A draft that is never touched again stops being resumable after 60 days. */

@@ -26,8 +26,8 @@ import {
   type FileCounts,
   type HoursValue,
   type SocialValue,
-} from '../../shared/questionnaire.ts'
-import { HttpError } from './http.ts'
+} from '../../shared/questionnaire.js'
+import { HttpError } from './http.js'
 
 const DEFAULT_MAX_TEXT = 4000
 const MAX_ROWS = 20
@@ -48,7 +48,7 @@ function rows<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value.slice(0, MAX_ROWS) as T[]) : []
 }
 
-const ADDRESS_KEYS: (keyof AddressValue)[] = [
+const ADDRESS_KEYS: (keyof AddressValue & string)[] = [
   'line1',
   'line2',
   'city',

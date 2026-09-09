@@ -5,16 +5,16 @@
  * leading bytes are read to confirm it really is the type its name claims. Only
  * then is it written to the private store and recorded against the record.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, eq, sql } from 'drizzle-orm'
-import { uploadSessions, uploadedFiles } from '../../db/schema.ts'
-import { MAX_UPLOAD_BYTES } from '../../shared/questionnaire.ts'
-import { assertUploadFieldAccepts } from '../lib/answers.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, handle, json, readJson } from '../lib/http.ts'
-import { blobKey, chunkKey, verifyUpload } from '../lib/uploads.ts'
-import { chunksStore, deleteQuietly, filesStore } from '../lib/storage.ts'
-import { loadSubmissionByToken } from '../lib/tokens.ts'
+import { uploadSessions, uploadedFiles } from '../../db/schema.js'
+import { MAX_UPLOAD_BYTES } from '../../shared/questionnaire.js'
+import { assertUploadFieldAccepts } from '../lib/answers.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle, json, readJson } from '../lib/http.js'
+import { blobKey, chunkKey, verifyUpload } from '../lib/uploads.js'
+import { chunksStore, deleteQuietly, filesStore } from '../lib/storage.js'
+import { loadSubmissionByToken } from '../lib/tokens.js'
 
 export default handle(async (request: Request, _context: HandlerContext) => {
   if (request.method !== 'POST') {

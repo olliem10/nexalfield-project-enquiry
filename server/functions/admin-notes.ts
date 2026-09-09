@@ -8,13 +8,13 @@
  * There is no customer-facing route that reads this table at all, so a note can
  * never be exposed by a mistake in the questionnaire code.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { eq } from 'drizzle-orm'
-import { internalNotes, submissions } from '../../db/schema.ts'
-import { NOTE_CATEGORY_VALUES } from '../../shared/questionnaire.ts'
-import { requireAdmin } from '../lib/auth.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, handle, json, noContent, readJson } from '../lib/http.ts'
+import { internalNotes, submissions } from '../../db/schema.js'
+import { NOTE_CATEGORY_VALUES } from '../../shared/questionnaire.js'
+import { requireAdmin } from '../lib/auth.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle, json, noContent, readJson } from '../lib/http.js'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const MAX_BODY = 5000

@@ -4,13 +4,13 @@
  * The delete is scoped to the questionnaire the continuation token identifies,
  * so a known file id is not on its own enough to delete someone else's upload.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, eq } from 'drizzle-orm'
-import { uploadedFiles } from '../../db/schema.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, handle, noContent } from '../lib/http.ts'
-import { deleteQuietly, filesStore } from '../lib/storage.ts'
-import { loadSubmissionByToken } from '../lib/tokens.ts'
+import { uploadedFiles } from '../../db/schema.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle, noContent } from '../lib/http.js'
+import { deleteQuietly, filesStore } from '../lib/storage.js'
+import { loadSubmissionByToken } from '../lib/tokens.js'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

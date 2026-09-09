@@ -6,16 +6,16 @@
  * customer their reference. The AI summary and confirmation email happen after
  * the response — neither can cause a submission to fail.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { eq } from 'drizzle-orm'
-import { checklistItems, submissions, uploadedFiles } from '../../db/schema.ts'
-import { CHECKLIST_ITEMS, type FileCounts } from '../../shared/questionnaire.ts'
-import { deriveContactFields, normaliseAnswers, validateSubmission } from '../lib/answers.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http.ts'
-import { allocateReference } from '../lib/reference.ts'
-import { scheduleFollowUp } from '../lib/tasks.ts'
-import { loadSubmissionByToken } from '../lib/tokens.ts'
+import { checklistItems, submissions, uploadedFiles } from '../../db/schema.js'
+import { CHECKLIST_ITEMS, type FileCounts } from '../../shared/questionnaire.js'
+import { deriveContactFields, normaliseAnswers, validateSubmission } from '../lib/answers.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http.js'
+import { allocateReference } from '../lib/reference.js'
+import { scheduleFollowUp } from '../lib/tasks.js'
+import { loadSubmissionByToken } from '../lib/tokens.js'
 
 export default handle(async (request: Request, context: HandlerContext) => {
   if (request.method !== 'POST') {

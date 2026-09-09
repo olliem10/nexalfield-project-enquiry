@@ -7,29 +7,29 @@
  * exactly the same paths, from one source of truth. Add a function here and
  * it is reachable everywhere.
  */
-import adminActions, { config as adminActionsConfig } from '../functions/admin-actions.ts'
-import adminAuth, { config as adminAuthConfig } from '../functions/admin-auth.ts'
-import adminChecklist, { config as adminChecklistConfig } from '../functions/admin-checklist.ts'
-import adminFile, { config as adminFileConfig } from '../functions/admin-file.ts'
-import adminNotes, { config as adminNotesConfig } from '../functions/admin-notes.ts'
-import adminProject, { config as adminProjectConfig } from '../functions/admin-project.ts'
-import adminProjects, { config as adminProjectsConfig } from '../functions/admin-projects.ts'
+import adminActions, { config as adminActionsConfig } from '../functions/admin-actions.js'
+import adminAuth, { config as adminAuthConfig } from '../functions/admin-auth.js'
+import adminChecklist, { config as adminChecklistConfig } from '../functions/admin-checklist.js'
+import adminFile, { config as adminFileConfig } from '../functions/admin-file.js'
+import adminNotes, { config as adminNotesConfig } from '../functions/admin-notes.js'
+import adminProject, { config as adminProjectConfig } from '../functions/admin-project.js'
+import adminProjects, { config as adminProjectsConfig } from '../functions/admin-projects.js'
 import questionnaireSession, {
   config as questionnaireSessionConfig,
-} from '../functions/questionnaire-session.ts'
+} from '../functions/questionnaire-session.js'
 import questionnaireSubmit, {
   config as questionnaireSubmitConfig,
-} from '../functions/questionnaire-submit.ts'
+} from '../functions/questionnaire-submit.js'
 import questionnaireSummary, {
   config as questionnaireSummaryConfig,
-} from '../functions/questionnaire-summary.ts'
-import uploadsChunk, { config as uploadsChunkConfig } from '../functions/uploads-chunk.ts'
+} from '../functions/questionnaire-summary.js'
+import uploadsChunk, { config as uploadsChunkConfig } from '../functions/uploads-chunk.js'
 import uploadsComplete, {
   config as uploadsCompleteConfig,
-} from '../functions/uploads-complete.ts'
-import uploadsDelete, { config as uploadsDeleteConfig } from '../functions/uploads-delete.ts'
-import uploadsInit, { config as uploadsInitConfig } from '../functions/uploads-init.ts'
-import type { FunctionConfig, HandlerContext } from './types.ts'
+} from '../functions/uploads-complete.js'
+import uploadsDelete, { config as uploadsDeleteConfig } from '../functions/uploads-delete.js'
+import uploadsInit, { config as uploadsInitConfig } from '../functions/uploads-init.js'
+import type { FunctionConfig, HandlerContext } from './types.js'
 
 export type RouteHandler = (request: Request, context: HandlerContext) => Promise<Response>
 

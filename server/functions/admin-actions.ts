@@ -6,14 +6,14 @@
  *
  * Both are ordinarily automatic; these exist so a failure is never a dead end.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, eq, isNotNull } from 'drizzle-orm'
-import { submissions } from '../../db/schema.ts'
-import { requireAdmin } from '../lib/auth.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, clientIp, handle, json, rateLimit } from '../lib/http.ts'
-import { runEmailTask, runSummaryTask } from '../lib/tasks.ts'
-import { loadProject, readProjectId } from './admin-project.ts'
+import { submissions } from '../../db/schema.js'
+import { requireAdmin } from '../lib/auth.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, clientIp, handle, json, rateLimit } from '../lib/http.js'
+import { runEmailTask, runSummaryTask } from '../lib/tasks.js'
+import { loadProject, readProjectId } from './admin-project.js'
 
 export default handle(async (request: Request, context: HandlerContext) => {
   const admin = requireAdmin(request)

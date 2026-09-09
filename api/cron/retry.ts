@@ -6,7 +6,7 @@
  * rows. The schedule lives in vercel.json — once daily, since the project
  * runs on Vercel's Hobby tier, which does not allow a finer-grained cron.
  */
-import runHousekeeping from '../../server/functions/retry-outstanding.ts'
+import runHousekeeping from '../../server/functions/retry-outstanding.js'
 
 export const config = { runtime: 'nodejs', maxDuration: 60 }
 

@@ -11,8 +11,8 @@
  * limit is enforced four times over: in the browser, when the upload is opened,
  * on each part as it arrives, and finally on the assembled bytes.
  */
-import { MAX_UPLOAD_BYTES, resolveUploadType, type UploadType } from '../../shared/questionnaire.ts'
-import { HttpError } from './http.ts'
+import { MAX_UPLOAD_BYTES, resolveUploadType, type UploadType } from '../../shared/questionnaire.js'
+import { HttpError } from './http.js'
 
 export function blobKey(submissionId: string, fileId: string): string {
   return `${submissionId}/${fileId}`

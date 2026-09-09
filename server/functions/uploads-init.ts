@@ -5,19 +5,19 @@
  * send, so each chunk can be checked against a server-side record rather than
  * against numbers the browser repeats back to us.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, eq, lt, sql } from 'drizzle-orm'
-import { uploadSessions, uploadedFiles } from '../../db/schema.ts'
+import { uploadSessions, uploadedFiles } from '../../db/schema.js'
 import {
   MAX_UPLOAD_BYTES,
   UPLOAD_CHUNK_BYTES,
   resolveUploadType,
-} from '../../shared/questionnaire.ts'
-import { assertUploadFieldAccepts } from '../lib/answers.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http.ts'
-import { safeFileName } from '../lib/uploads.ts'
-import { loadSubmissionByToken } from '../lib/tokens.ts'
+} from '../../shared/questionnaire.js'
+import { assertUploadFieldAccepts } from '../lib/answers.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http.js'
+import { safeFileName } from '../lib/uploads.js'
+import { loadSubmissionByToken } from '../lib/tokens.js'
 
 export default handle(async (request: Request, context: HandlerContext) => {
   if (request.method !== 'POST') {

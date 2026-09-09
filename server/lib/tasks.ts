@@ -8,11 +8,11 @@
  * submission.
  */
 import { and, eq, inArray, isNotNull, lt, or, sql } from 'drizzle-orm'
-import { submissions, uploadedFiles, type Submission } from '../../db/schema.ts'
-import { generateProjectSummary } from './ai.ts'
-import { configuredAdmins } from './auth.ts'
-import { getDb } from './db.ts'
-import { emailIsConfigured, sendAdminNotification, sendConfirmationEmail } from './email.ts'
+import { submissions, uploadedFiles, type Submission } from '../../db/schema.js'
+import { generateProjectSummary } from './ai.js'
+import { configuredAdmins } from './auth.js'
+import { getDb } from './db.js'
+import { emailIsConfigured, sendAdminNotification, sendConfirmationEmail } from './email.js'
 
 /** Regenerates and stores the project brief. Never throws. */
 export async function runSummaryTask(submissionId: string): Promise<void> {
