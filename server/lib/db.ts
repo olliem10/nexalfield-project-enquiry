@@ -42,6 +42,15 @@ export function getDb(): Database {
     connectionTimeoutMillis: 10_000,
   })
 
+  // The pool emits this on behalf of an idle client that hits a connection
+  // problem (a managed provider closing it, a network blip) — with no
+  // listener, that is an unhandled error and it crashes the whole process.
+  // The next query gets a fresh connection regardless; there is nothing more
+  // to do here than stop that crash.
+  pool.on('error', (error) => {
+    console.error('Idle database client error:', error)
+  })
+
   cached = drizzle(pool, { schema })
   return cached
 }
