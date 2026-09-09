@@ -1,22 +1,27 @@
-# Dependencies
-node_modules
+# dependencies
+/node_modules
 
-# Build output
-dist
-.vite
+# next.js
+/.next/
+/out/
 
-# Environment files — never commit real values. Use .env.example as the template.
-.env
-.env.local
-.env.*.local
+# production
+/build
 
-# Logs and editor cruft
-*.log
+# misc
 .DS_Store
-Thumbs.db
+*.pem
 
-# Screenshots produced by scripts/browser-check.mjs
-.screenshots
+# debug
+npm-debug.log*
 
-# Raw UI audit output (kept pairs live in docs/ui-audit)
-.audit
+# local env files — never commit real values. Use .env.example as the template.
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

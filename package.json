@@ -2,41 +2,26 @@
   "name": "nexalfield-project-enquiry",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc -b --force",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "node scripts/migrate.mjs",
-    "hash-password": "node scripts/hash-password.mjs",
-    "start:local": "node --experimental-strip-types scripts/local-server.mjs",
-    "test": "npm run typecheck && npm run test:api",
-    "test:api": "node --experimental-strip-types scripts/e2e.mjs",
-    "test:email": "node --experimental-strip-types scripts/email-check.mjs",
-    "test:browser": "node scripts/browser-check.mjs"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.124.0",
-    "@vercel/functions": "^3.9.5",
-    "drizzle-orm": "^0.45.2",
-    "nodemailer": "^7.0.9",
-    "pg": "^8.13.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.4"
+    "next": "^16.3.4",
+    "pg": "^8.23.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.18.9",
-    "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
-    "@vitejs/plugin-react": "^5.0.4",
-    "drizzle-kit": "^0.31.10",
-    "playwright": "^1.63.0",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.9"
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
   }
 }
