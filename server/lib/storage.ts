@@ -18,8 +18,8 @@
  * responses in the first place.
  */
 import { and, eq, lt } from 'drizzle-orm'
-import { blobObjects } from '../../db/schema'
-import { getDb } from './db'
+import { blobObjects } from '../../db/schema.js'
+import { getDb } from './db.js'
 
 /** What the upload routes need, and nothing more. */
 export interface ObjectStore {

@@ -7,11 +7,11 @@
  * notice and fix by hand.
  */
 import { and, eq, inArray, isNull, lt, sql } from 'drizzle-orm'
-import { submissions, uploadSessions, uploadedFiles } from '../../db/schema'
-import { getDb } from '../lib/db'
-import { pruneRateLimits } from '../lib/http'
-import { findOutstanding, runEmailTask, runSummaryTask } from '../lib/tasks'
-import { chunksStore, deleteQuietly, filesStore, prunePostgresChunks } from '../lib/storage'
+import { submissions, uploadSessions, uploadedFiles } from '../../db/schema.js'
+import { getDb } from '../lib/db.js'
+import { pruneRateLimits } from '../lib/http.js'
+import { findOutstanding, runEmailTask, runSummaryTask } from '../lib/tasks.js'
+import { chunksStore, deleteQuietly, filesStore, prunePostgresChunks } from '../lib/storage.js'
 
 async function retryOutstanding(): Promise<number> {
   const pending = await findOutstanding(20)

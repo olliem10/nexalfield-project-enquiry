@@ -5,14 +5,14 @@
  * URL, so there is no address to guess and no signed link to leak: access is
  * decided here, per request, by the session cookie.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { eq } from 'drizzle-orm'
-import { uploadedFiles } from '../../db/schema'
-import { requireAdmin } from '../lib/auth'
-import { getDb } from '../lib/db'
-import { HttpError, handle } from '../lib/http'
-import { contentDispositionHeader, dispositionFor } from '../lib/uploads'
-import { filesStore } from '../lib/storage'
+import { uploadedFiles } from '../../db/schema.js'
+import { requireAdmin } from '../lib/auth.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle } from '../lib/http.js'
+import { contentDispositionHeader, dispositionFor } from '../lib/uploads.js'
+import { filesStore } from '../lib/storage.js'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

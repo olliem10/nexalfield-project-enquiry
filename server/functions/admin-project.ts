@@ -5,18 +5,18 @@
  *   GET   /api/admin/projects/:id
  *   PATCH /api/admin/projects/:id   { status }
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, asc, desc, eq, isNotNull } from 'drizzle-orm'
 import {
   checklistItems,
   internalNotes,
   submissions,
   uploadedFiles,
-} from '../../db/schema'
-import { CHECKLIST_ITEMS, STATUS_VALUES } from '../../shared/questionnaire'
-import { requireAdmin, type Admin } from '../lib/auth'
-import { getDb } from '../lib/db'
-import { HttpError, handle, json, readJson } from '../lib/http'
+} from '../../db/schema.js'
+import { CHECKLIST_ITEMS, STATUS_VALUES } from '../../shared/questionnaire.js'
+import { requireAdmin, type Admin } from '../lib/auth.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle, json, readJson } from '../lib/http.js'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

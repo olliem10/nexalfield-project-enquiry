@@ -6,7 +6,7 @@
  */
 import { drizzle } from 'drizzle-orm/node-postgres'
 import pg from 'pg'
-import * as schema from '../../db/schema'
+import * as schema from '../../db/schema.js'
 
 type Database = ReturnType<typeof drizzle<typeof schema>>
 

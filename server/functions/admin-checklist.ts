@@ -6,13 +6,13 @@
  * Stored in its own table, keyed by item, so ticking a box never rewrites the
  * project status and changing the status never disturbs the checklist.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, asc, eq, isNotNull } from 'drizzle-orm'
-import { checklistItems, submissions } from '../../db/schema'
-import { CHECKLIST_ITEMS } from '../../shared/questionnaire'
-import { requireAdmin } from '../lib/auth'
-import { getDb } from '../lib/db'
-import { HttpError, handle, json, readJson } from '../lib/http'
+import { checklistItems, submissions } from '../../db/schema.js'
+import { CHECKLIST_ITEMS } from '../../shared/questionnaire.js'
+import { requireAdmin } from '../lib/auth.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle, json, readJson } from '../lib/http.js'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

@@ -7,29 +7,29 @@
  * exactly the same paths, from one source of truth. Add a function here and
  * it is reachable everywhere.
  */
-import adminActions, { config as adminActionsConfig } from '../functions/admin-actions'
-import adminAuth, { config as adminAuthConfig } from '../functions/admin-auth'
-import adminChecklist, { config as adminChecklistConfig } from '../functions/admin-checklist'
-import adminFile, { config as adminFileConfig } from '../functions/admin-file'
-import adminNotes, { config as adminNotesConfig } from '../functions/admin-notes'
-import adminProject, { config as adminProjectConfig } from '../functions/admin-project'
-import adminProjects, { config as adminProjectsConfig } from '../functions/admin-projects'
+import adminActions, { config as adminActionsConfig } from '../functions/admin-actions.js'
+import adminAuth, { config as adminAuthConfig } from '../functions/admin-auth.js'
+import adminChecklist, { config as adminChecklistConfig } from '../functions/admin-checklist.js'
+import adminFile, { config as adminFileConfig } from '../functions/admin-file.js'
+import adminNotes, { config as adminNotesConfig } from '../functions/admin-notes.js'
+import adminProject, { config as adminProjectConfig } from '../functions/admin-project.js'
+import adminProjects, { config as adminProjectsConfig } from '../functions/admin-projects.js'
 import questionnaireSession, {
   config as questionnaireSessionConfig,
-} from '../functions/questionnaire-session'
+} from '../functions/questionnaire-session.js'
 import questionnaireSubmit, {
   config as questionnaireSubmitConfig,
-} from '../functions/questionnaire-submit'
+} from '../functions/questionnaire-submit.js'
 import questionnaireSummary, {
   config as questionnaireSummaryConfig,
-} from '../functions/questionnaire-summary'
-import uploadsChunk, { config as uploadsChunkConfig } from '../functions/uploads-chunk'
+} from '../functions/questionnaire-summary.js'
+import uploadsChunk, { config as uploadsChunkConfig } from '../functions/uploads-chunk.js'
 import uploadsComplete, {
   config as uploadsCompleteConfig,
-} from '../functions/uploads-complete'
-import uploadsDelete, { config as uploadsDeleteConfig } from '../functions/uploads-delete'
-import uploadsInit, { config as uploadsInitConfig } from '../functions/uploads-init'
-import type { FunctionConfig, HandlerContext } from './types'
+} from '../functions/uploads-complete.js'
+import uploadsDelete, { config as uploadsDeleteConfig } from '../functions/uploads-delete.js'
+import uploadsInit, { config as uploadsInitConfig } from '../functions/uploads-init.js'
+import type { FunctionConfig, HandlerContext } from './types.js'
 
 export type RouteHandler = (request: Request, context: HandlerContext) => Promise<Response>
 

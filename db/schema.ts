@@ -19,7 +19,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
-import type { Answers } from '../shared/questionnaire'
+import type { Answers } from '../shared/questionnaire.js'
 
 /* ------------------------------------------------------------------ *
  * Submissions

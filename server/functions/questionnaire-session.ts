@@ -5,14 +5,14 @@
  *   GET    — resume the draft the token identifies
  *   PATCH  — autosave answers and the current step
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { asc, eq } from 'drizzle-orm'
-import { submissions, uploadedFiles } from '../../db/schema'
-import { clampStep, normaliseAnswers } from '../lib/answers'
-import { getDb } from '../lib/db'
-import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http'
-import { createResumeToken, draftExpiry, loadSubmissionByToken } from '../lib/tokens'
-import type { Submission } from '../../db/schema'
+import { submissions, uploadedFiles } from '../../db/schema.js'
+import { clampStep, normaliseAnswers } from '../lib/answers.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http.js'
+import { createResumeToken, draftExpiry, loadSubmissionByToken } from '../lib/tokens.js'
+import type { Submission } from '../../db/schema.js'
 
 async function filesFor(submissionId: string) {
   const db = getDb()

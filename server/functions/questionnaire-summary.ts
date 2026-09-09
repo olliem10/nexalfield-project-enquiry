@@ -7,10 +7,10 @@
  * The customer sees only the summary for their own submission, identified by
  * their continuation token. Nothing internal is exposed here.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types'
-import { HttpError, clientIp, handle, json, rateLimit } from '../lib/http'
-import { runSummaryTask } from '../lib/tasks'
-import { loadSubmissionByToken } from '../lib/tokens'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
+import { HttpError, clientIp, handle, json, rateLimit } from '../lib/http.js'
+import { runSummaryTask } from '../lib/tasks.js'
+import { loadSubmissionByToken } from '../lib/tokens.js'
 
 export default handle(async (request: Request, context: HandlerContext) => {
   if (request.method !== 'GET' && request.method !== 'POST') {

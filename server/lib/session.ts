@@ -8,7 +8,7 @@
  * list — the trade for having no per-request database lookup on every route.
  */
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { HttpError, requireEnv } from './http'
+import { HttpError, requireEnv } from './http.js'
 
 export const SESSION_COOKIE = 'nf_admin_session'
 const MAX_AGE_SECONDS = 60 * 60 * 12

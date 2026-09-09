@@ -6,13 +6,13 @@
  * ten thousand. Drafts are never listed — only questionnaires a customer
  * actually sent.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types'
+import type { FunctionConfig, HandlerContext } from '../lib/types.js'
 import { and, asc, desc, eq, isNotNull, sql, type SQL } from 'drizzle-orm'
-import { checklistItems, submissions } from '../../db/schema'
-import { CHECKLIST_ITEMS, STATUS_VALUES } from '../../shared/questionnaire'
-import { requireAdmin } from '../lib/auth'
-import { getDb } from '../lib/db'
-import { HttpError, handle, json } from '../lib/http'
+import { checklistItems, submissions } from '../../db/schema.js'
+import { CHECKLIST_ITEMS, STATUS_VALUES } from '../../shared/questionnaire.js'
+import { requireAdmin } from '../lib/auth.js'
+import { getDb } from '../lib/db.js'
+import { HttpError, handle, json } from '../lib/http.js'
 
 const PAGE_SIZE = 25
 

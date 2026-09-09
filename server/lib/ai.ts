@@ -13,9 +13,9 @@ import {
   formatAnswer,
   visibleFields,
   type Answers,
-} from '../../shared/questionnaire'
-import type { StoredSummary } from '../../db/schema'
-import { optionalEnv } from './http'
+} from '../../shared/questionnaire.js'
+import type { StoredSummary } from '../../db/schema.js'
+import { optionalEnv } from './http.js'
 
 const DEFAULT_MODEL = 'claude-opus-5'
 

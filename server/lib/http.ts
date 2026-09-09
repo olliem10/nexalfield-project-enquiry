@@ -5,9 +5,9 @@
  * for the customer, never a stack trace or a database detail.
  */
 import { sql } from 'drizzle-orm'
-import { rateLimits } from '../../db/schema'
-import { getDb } from './db'
-import type { HandlerContext } from './types'
+import { rateLimits } from '../../db/schema.js'
+import { getDb } from './db.js'
+import type { HandlerContext } from './types.js'
 
 export interface FieldIssue {
   fieldId: string

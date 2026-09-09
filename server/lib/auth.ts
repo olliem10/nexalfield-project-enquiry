@@ -8,8 +8,8 @@
  */
 import { pbkdf2, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
-import { HttpError, optionalEnv } from './http'
-import { readCookie, readSessionCookieValue, SESSION_COOKIE, unauthorized } from './session'
+import { HttpError, optionalEnv } from './http.js'
+import { readCookie, readSessionCookieValue, SESSION_COOKIE, unauthorized } from './session.js'
 
 const pbkdf2Async = promisify(pbkdf2)
 
