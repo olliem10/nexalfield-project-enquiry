@@ -7,7 +7,7 @@
  * because a mail server was down would not be.
  */
 import nodemailer from 'nodemailer'
-import { optionalEnv } from './http.ts'
+import { optionalEnv } from './http'
 
 export type EmailOutcome =
   | { status: 'sent'; provider: string }

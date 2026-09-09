@@ -13,9 +13,9 @@ import {
   formatAnswer,
   visibleFields,
   type Answers,
-} from '../../shared/questionnaire.ts'
-import type { StoredSummary } from '../../db/schema.ts'
-import { optionalEnv } from './http.ts'
+} from '../../shared/questionnaire'
+import type { StoredSummary } from '../../db/schema'
+import { optionalEnv } from './http'
 
 const DEFAULT_MODEL = 'claude-opus-5'
 

@@ -5,14 +5,14 @@
  * ground down, and a wrong email and a wrong password produce exactly the same
  * response — there is no way to discover which addresses exist.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
-import { adminsAreConfigured, notConfigured, requireAdmin, verifyCredentials } from '../lib/auth.ts'
-import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types'
+import { adminsAreConfigured, notConfigured, requireAdmin, verifyCredentials } from '../lib/auth'
+import { HttpError, clientIp, handle, json, rateLimit, readJson } from '../lib/http'
 import {
   createSessionCookieValue,
   sessionClearCookie,
   sessionSetCookie,
-} from '../lib/session.ts'
+} from '../lib/session'
 
 async function login(request: Request, context: HandlerContext): Promise<Response> {
   if (!adminsAreConfigured()) throw notConfigured()

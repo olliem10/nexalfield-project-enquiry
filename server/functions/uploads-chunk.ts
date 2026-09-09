@@ -6,15 +6,15 @@
  * opened server-side: the right questionnaire, a valid index, and a size that
  * cannot push the file past 20MB however the browser slices it.
  */
-import type { FunctionConfig, HandlerContext } from '../lib/types.ts'
+import type { FunctionConfig, HandlerContext } from '../lib/types'
 import { and, eq, sql } from 'drizzle-orm'
-import { uploadSessions } from '../../db/schema.ts'
-import { MAX_UPLOAD_BYTES } from '../../shared/questionnaire.ts'
-import { getDb } from '../lib/db.ts'
-import { HttpError, handle, json } from '../lib/http.ts'
-import { chunkKey } from '../lib/uploads.ts'
-import { chunksStore } from '../lib/storage.ts'
-import { loadSubmissionByToken } from '../lib/tokens.ts'
+import { uploadSessions } from '../../db/schema'
+import { MAX_UPLOAD_BYTES } from '../../shared/questionnaire'
+import { getDb } from '../lib/db'
+import { HttpError, handle, json } from '../lib/http'
+import { chunkKey } from '../lib/uploads'
+import { chunksStore } from '../lib/storage'
+import { loadSubmissionByToken } from '../lib/tokens'
 
 export default handle(async (request: Request, _context: HandlerContext) => {
   if (request.method !== 'PUT') {

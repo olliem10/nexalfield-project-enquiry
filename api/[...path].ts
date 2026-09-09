@@ -10,7 +10,7 @@
  * so a function is reachable here purely by existing.
  */
 import { waitUntil } from '@vercel/functions'
-import { matchRoute, notFound } from '../server/lib/router.ts'
+import { matchRoute, notFound } from '../server/lib/router'
 
 export const config = {
   runtime: 'nodejs',

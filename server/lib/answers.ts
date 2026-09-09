@@ -26,8 +26,8 @@ import {
   type FileCounts,
   type HoursValue,
   type SocialValue,
-} from '../../shared/questionnaire.ts'
-import { HttpError } from './http.ts'
+} from '../../shared/questionnaire'
+import { HttpError } from './http'
 
 const DEFAULT_MAX_TEXT = 4000
 const MAX_ROWS = 20

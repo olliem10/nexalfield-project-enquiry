@@ -6,8 +6,8 @@
  */
 import { randomInt } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { submissions } from '../../db/schema.ts'
-import { getDb } from './db.ts'
+import { submissions } from '../../db/schema'
+import { getDb } from './db'
 
 /**
  * Four digits is only 9,000 possibilities, so a collision becomes realistic
